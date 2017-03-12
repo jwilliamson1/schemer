@@ -3,6 +3,7 @@
 (define atom?
   (lambda (x)
     (and (not (pair? x)) (not (null? x)))))
+;LAT = LIST OF ATOMS
 ;lat returns true if l is a list of atoms
 (define lat?
   (lambda (l)
@@ -11,17 +12,7 @@
     [(atom? (car l)) (lat? (cdr l))]
     [else #f]
     )))
-;(define eq?
-;  (lambda (n m)
-;    (cond
-;    [(and(zero? n)(zero? m))]
-;    [(or(zero? n)(zero? m)) #f]
-;    [else (eq? (sub1 n)(sub1 m))])))
-;(eq? 1 3)
-;(eq? 3 1)
-;(eq? 0 1)
-;(eq? 1 1)
-;(eq? 0 0)
+
 (define member?
   (lambda (a lat)
     (cond
@@ -30,6 +21,17 @@
                 (member? a (cdr lat)))))))
 ;(member? 'meat (list 'mashed 'potatoes' 'and 'meat 'and 'gravy))
 ;(member? 'tar (list 'mashed 'potatoes' 'and 'meat 'and 'gravy))
+
+(define rember
+  (lambda (a lat)
+    (cond
+      ((null? lat)(quote ()))
+      [( eq? (car lat) a)( cdr lat)]
+      [else (cons(car lat)
+             (rember a
+                ( cdr lat)))])))
+;(rember 'bacon (list 'bacon 'lettuce 'and 'tomato))
+;(rember 'and (list 'bacon 'lettuce 'and 'tomato))
 ;string functions
 (define firsts
   (lambda (l)
@@ -37,6 +39,10 @@
       [(null? l)(quote())]
       [else (cons (car (car l))
                   (firsts (cdr l)))])))
+;(define fruit '(((five plums) four)
+;(eleven green oranges)
+;((no) more)))
+;(firsts fruit)
 ;number functions
 (define add1
   (lambda (n)
@@ -136,18 +142,31 @@
 ;(div 45 0)
 
 (define rember*
-  (lambda (a l)
+  (lambda (a lat)
     (cond
-      [(eq? cdr a) car]
-      [(atom? cdr #f) (rember* car)]
-      [else (rember* a cdr)]))
+      [(null? lat)(quote())]
+      [(eq? (car lat) a) (rember* a (cdr lat))]      
+      [else (cons (car lat)(rember* a (cdr lat)))]))
     )
+;(rember* 'and '(chips and dip and salsa))
+;(rember* 'and '(dog and and cat))
+
+;insert to the right of atom
+(define insertR
+  (lambda (l old new)
+    (cond
+      [(null? l) (quote())]
+      [(eq? (car l) old)(cons new (cdr l))]
+      [else (cons (car l)(insertR (cdr l) old new))])))
+(insertR  '(tacos tamales and salsa)  'and 'jalepenos) 
+
 (define multiSubst
   (lambda (lat old new)
     (cond
       [(null? lat) (quote())]
       [(eq?(car lat) old)
-       (cons new (multiSubst(cdr lat)))]
+       (cons new (multiSubst (cdr lat) old new))]
       [else cons (car lat)
-            (multiSubst (cdr lat))]
+            (cdr lat)]
       )))
+(multiSubst '(wang tang flip boom)'wang 'bip)
