@@ -1,15 +1,8 @@
 #lang racket
-;string functions
-(define firsts
-  (lambda (l)
-    (cond
-      [(null? l)(quote())]
-      [else (cons (car (car l))
-                  (firsts (cdr l)))])))
-                            
+;quote() is notation for null list
 (define atom?
-(lambda (x)
-(and (not (pair? x)) (not (null? x)))))
+  (lambda (x)
+    (and (not (pair? x)) (not (null? x)))))
 ;lat returns true if l is a list of atoms
 (define lat?
   (lambda (l)
@@ -18,6 +11,32 @@
     [(atom? (car l)) (lat? (cdr l))]
     [else #f]
     )))
+;(define eq?
+;  (lambda (n m)
+;    (cond
+;    [(and(zero? n)(zero? m))]
+;    [(or(zero? n)(zero? m)) #f]
+;    [else (eq? (sub1 n)(sub1 m))])))
+;(eq? 1 3)
+;(eq? 3 1)
+;(eq? 0 1)
+;(eq? 1 1)
+;(eq? 0 0)
+(define member?
+  (lambda (a lat)
+    (cond
+      ((null? lat) #f)
+      (else (or (eq? (car lat) a)
+                (member? a (cdr lat)))))))
+;(member? 'meat (list 'mashed 'potatoes' 'and 'meat 'and 'gravy))
+;(member? 'tar (list 'mashed 'potatoes' 'and 'meat 'and 'gravy))
+;string functions
+(define firsts
+  (lambda (l)
+    (cond
+      [(null? l)(quote())]
+      [else (cons (car (car l))
+                  (firsts (cdr l)))])))
 ;number functions
 (define add1
   (lambda (n)
@@ -59,10 +78,10 @@
 
 
 (define length
-  (lambda (lat)
+  (lambda (l)
     (cond
-      [(null? lat) 0]
-      [else (add1(length(cdr lat)))])))
+      [(null? l) 0]
+      [else (add1(length(cdr l)))])))
 
 (define pick
     (lambda (n lat)
@@ -103,17 +122,7 @@
 ;(less 4 6)
 ;(less 3 1)
 ;(less 1 1)
-(define eq?
-  (lambda (n m)
-    (cond
-    [(and(zero? n)(zero? m))]
-    [(or(zero? n)(zero? m)) #f]
-    [else (eq? (sub1 n)(sub1 m))])))
-;(eq? 1 3)
-;(eq? 3 1)
-;(eq? 0 1)
-;(eq? 1 1)
-;(eq? 0 0)
+
     
 (define div
   (lambda (n m)
@@ -121,7 +130,24 @@
       [(eq? m 0) "Err:div by 0"]
       [(less n m) 0]
       [(add1 (div (subt n m) m))])))
-    (div 45 9)
-(div 45 5)
-(div 45 1)
-(div 45 0)
+;(div 45 9)
+;(div 45 5)
+;(div 45 1)
+;(div 45 0)
+
+(define rember*
+  (lambda (a l)
+    (cond
+      [(eq? cdr a) car]
+      [(atom? cdr #f) (rember* car)]
+      [else (rember* a cdr)]))
+    )
+(define multiSubst
+  (lambda (lat old new)
+    (cond
+      [(null? lat) (quote())]
+      [(eq?(car lat) old)
+       (cons new (multiSubst(cdr lat)))]
+      [else cons (car lat)
+            (multiSubst (cdr lat))]
+      )))
