@@ -175,7 +175,22 @@
       [(null? l)(quote())]
       [(eq? (car l) old)(cons new (cdr l))]
       [else (cons (car l)(subst(cdr l) old new))])))
-(subst '(a great green dragon) 'green 'gold)
+;(subst '(a great green dragon) 'green 'gold)
+(define subst2
+  (lambda (l new o1 o2)
+    (cond
+      [(null? l)(quote())]
+      [(or (eq? (car l) o1)(eq? (car l) o2))(cons new (cdr l))]      
+      [else (cons (car l)(subst2(cdr l) new o1 o2))])))
+;(subst2 '(banana ice cream with chocolate topping) 'vanilla 'chocolate 'banana)
+;(subst2 '(Mint ice cream with chocolate topping) 'vanilla 'chocolate 'banana)
+(define multirember
+  (lambda (a lat)
+    (cond
+      [(null? lat)(quote())]
+      [(eq? (car lat) a)(multirember a (cdr lat))]
+      [else (cons (car lat)(multirember a (cdr lat)))])))
+;(multirember 'cup '(coffee cup tea cup hick cup))      
 
 (define multiSubst
   (lambda (lat old new)
