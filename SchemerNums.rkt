@@ -192,13 +192,28 @@
       [else (cons (car lat)(multirember a (cdr lat)))])))
 ;(multirember 'cup '(coffee cup tea cup hick cup))      
 
+
+(define multiinsertR
+  (lambda (new old lat)
+    (cond
+      [(null? lat)(quote())]
+      [(eq?(car lat) old)(cons old(cons new (multiinsertR new old (cdr lat))))]
+      [else(cons (car lat)(multiinsertR new old (cdr lat)))])))
+;(multiinsertR 'of 'cup '(cup coffee cup tea cup hick cup))
+
+(define multiinsertL
+  (lambda (new old lat)
+    (cond
+      [(null? lat)(quote())]
+      [(eq?(car lat) old)(cons new(cons old (multiinsertL new old(cdr lat))))]
+      [else(cons (car lat)(multiinsertL new old(cdr lat)))])))
+;(multiinsertL 'a 'cup '(cup coffee cup tea cup hick cup))
+
 (define multiSubst
-  (lambda (lat old new)
+  (lambda (new old lat)
     (cond
       [(null? lat) (quote())]
-      [(eq?(car lat) old)
-       (cons new (multiSubst (cdr lat) old new))]
-      [else cons (car lat)
-            (cdr lat)]
+      [(eq?(car lat) old)(cons new (multiSubst new old (cdr lat)))]
+      [else (cons (car lat)(multiSubst new old (cdr lat)))]
       )))
-;(multiSubst '(wang tang flip boom)'wang 'bip)
+;(multiSubst 'the 'a '(a dark place for a dark mind))
