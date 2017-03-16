@@ -81,7 +81,20 @@
       [(<= n 0) 0]
       [else (add1 (div (subt n m) m))])))
 
+(define addtup
+  (lambda (tup)
+    (cond
+      [(null? tup) 0]
+      [else(add (car tup)(addtup(cdr tup)))])))
+(addtup '(3 1 4))
 
+(define combtup
+  (lambda(tup1 tup2)
+    (cond
+      [(and(null? tup1)(null? tup2) 0)]
+      [else (cons(add(car tup1)(addtup(cdr tup1)))
+                 (add(car tup2)(addtup(cdr tup2))))])))
+(combtup '(8 2)'(10 4))            
 
 (define length
   (lambda (l)
@@ -106,9 +119,9 @@
 (define t2 (list 3 4 5 6))
 (define t3 (list 100 200 300))
 ;tests
-;(tup+ t1 t3)
-;(tup+ t2 t3)
-;(tup+ t2 t1)
+(tup+ t1 t3);
+(tup+ t2 t3)
+(tup+ t2 t1)
 (define grtr
   (lambda (n m)
     (cond
