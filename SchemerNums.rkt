@@ -86,15 +86,15 @@
     (cond
       [(null? tup) 0]
       [else(add (car tup)(addtup(cdr tup)))])))
-(addtup '(3 1 4))
+;(addtup '(3 1 4))
 
 (define combtup
   (lambda(tup1 tup2)
     (cond
-      [(and(null? tup1)(null? tup2) 0)]
+      [(and(null? tup1)(null? tup2) (quote()))]
       [else (cons(add(car tup1)(addtup(cdr tup1)))
                  (add(car tup2)(addtup(cdr tup2))))])))
-(combtup '(8 2)'(10 4))            
+;(combtup (list 8 2)(list 10 4))            
 
 (define length
   (lambda (l)
@@ -108,6 +108,33 @@
         [(zero? (sub1 n))(car lat)]
         [else (pick (sub1 n)(cdr lat))])))
 
+(define rempick
+  (lambda (n lat)
+    (cond      
+      [(zero? (sub1 n))(cdr lat)]
+      [else
+       (cons(car lat)
+            (rempick (sub1 n)(cdr lat)))]
+      )))
+;(rempick 3 '(hotdogs with hot mustard))
+
+(define no-nums
+  (lambda (lat)
+    (cond
+      [(null? lat)(quote())]
+      [(number? (car lat))(no-nums(cdr lat))]
+      [else (cons (car lat)(no-nums(cdr lat)))])))
+;(no-nums '(5 pears 6 prunes 9 dates))
+
+(define all-nums
+  (lambda (lat)
+    (cond
+      [(null? lat) (quote())]
+      [(number? (car lat))
+       (cons (car lat)(all-nums(cdr lat)))]
+      [else (all-nums(cdr lat))])))
+;(all-nums '(5 pears 6 prunes 9 dates))
+
 (define tup+
   (lambda (tup1 tup2)
     (cond
@@ -118,10 +145,11 @@
 (define t1 (list 10 20 30 50 60 70))
 (define t2 (list 3 4 5 6))
 (define t3 (list 100 200 300))
-;tests
-(tup+ t1 t3);
-(tup+ t2 t3)
-(tup+ t2 t1)
+
+;(tup+ t1 t3);
+;(tup+ t2 t3)
+;(tup+ t2 t1)
+
 (define grtr
   (lambda (n m)
     (cond
@@ -142,7 +170,7 @@
 ;(less 3 1)
 ;(less 1 1)
 
-    
+
 (define div
   (lambda (n m)
     (cond
