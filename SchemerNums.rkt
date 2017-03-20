@@ -135,6 +135,32 @@
       [else (all-nums(cdr lat))])))
 ;(all-nums '(5 pears 6 prunes 9 dates))
 
+(define equan?
+  (lambda (a1 a2)
+    (cond
+      [(and (number? a1)(number? a2))
+       (= a1 a2)]
+      [(or(number? a1)(number? a2)) #f]
+      [else (eq? a1 a2)])))
+
+;(equan? 'r 'r)      
+;(equan? 'r 's)
+;(equan? 1 1)
+;(equan? 1 2)
+;(equan? 'A 1)
+
+(define occur
+  (lambda (a lat)
+    (cond
+      [(null? lat) 0]
+      [else
+       (cond
+         [(equan? (car lat) a)
+          (add1(occur a (cdr lat)))]
+         [else (occur a (cdr lat))])])))
+          
+(occur 'to '(to the moon to the stars to beyond))                  
+
 (define tup+
   (lambda (tup1 tup2)
     (cond
