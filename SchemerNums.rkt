@@ -284,3 +284,19 @@
       [else (cons (car lat)(multiSubst new old (cdr lat)))]
       )))
 ;(multiSubst 'the 'a '(a dark place for a dark mind))
+(define one?
+  (lambda (n)
+    (= n 1)))
+;(one? 3)
+;(one? 0)
+;(one? 1)
+(define rempick?
+  (lambda (n lat)
+    (cond
+      [(null? lat)(quote())]
+      [(one? n)(cdr lat)]
+      [else (cons (car lat)(rempick? (sub1 n)(cdr lat)))])))
+(rempick? 3 '(lemon meringue salty pie))
+(rempick? 1 '(lemon meringue salty pie))
+(rempick? 4 '(lemon meringue salty pie))
+(rempick? 3 '())
