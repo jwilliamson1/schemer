@@ -159,7 +159,7 @@
           (add1(occur a (cdr lat)))]
          [else (occur a (cdr lat))])])))
           
-(occur 'to '(to the moon to the stars to beyond))                  
+;(occur 'to '(to the moon to the stars to beyond))                  
 
 (define tup+
   (lambda (tup1 tup2)
@@ -208,13 +208,13 @@
 ;(div 45 1)
 ;(div 45 0)
 
-(define rember*
-  (lambda (a lat)
-    (cond
-      [(null? lat)(quote())]
-      [(eq? (car lat) a) (rember* a (cdr lat))]      
-      [else (cons (car lat)(rember* a (cdr lat)))]))
-    )
+;(define rember*
+;  (lambda (a lat)
+;    (cond
+;      [(null? lat)(quote())]
+;      [(eq? (car lat) a) (rember* a (cdr lat))]      
+;      [else (cons (car lat)(rember* a (cdr lat)))]))
+;    )
 ;(rember* 'and '(chips and dip and salsa))
 ;(rember* 'and '(dog and and cat))
 
@@ -296,7 +296,43 @@
       [(null? lat)(quote())]
       [(one? n)(cdr lat)]
       [else (cons (car lat)(rempick? (sub1 n)(cdr lat)))])))
-(rempick? 3 '(lemon meringue salty pie))
-(rempick? 1 '(lemon meringue salty pie))
-(rempick? 4 '(lemon meringue salty pie))
-(rempick? 3 '())
+;(rempick? 3 '(lemon meringue salty pie))
+;(rempick? 1 '(lemon meringue salty pie))
+;(rempick? 4 '(lemon meringue salty pie))
+;(rempick? 3 '())
+(define rember*
+  (lambda (a l)
+    (cond
+      [(null? l)(quote())]
+      [(atom? l)
+       (cond
+         [(eq? l a) ]
+         [else l])]
+      [(lat? l)
+       (cond         
+         ;returns the cdr removing desired param
+         [(eq? a (car l))(cdr l)]
+         ;returns the lat unchanged
+         [else (cons (car l)(rember* a (cdr l)))])]
+      
+      [else
+       (cond       
+         ;recurs
+         [else (cons (rember* a (car l))(rember* a (cdr l)))])])))
+
+(rember* 'sauce '(((tomato sauce))
+((bean) sauce)
+(and ((flying)) sauce)) )
+
+(rember* 'cup '((coffee) cup ((tea) cup)
+(and (hick)) cup)) 
+
+;(define paren-test
+;  (lambda (a lat)
+;    (cond
+      
+;      [(lat? lat) )       
+
+
+;(paren-test 'a '((a)))
+;(car(cdr '((3 5 6)(4 5 6))))
