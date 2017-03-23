@@ -306,7 +306,7 @@
       [(null? l)(quote())]
       [(atom? l)
        (cond
-         [(eq? l a) ]
+         [(eq? l a)(quote())]
          [else l])]
       [(lat? l)
        (cond         
@@ -326,13 +326,3 @@
 
 (rember* 'cup '((coffee) cup ((tea) cup)
 (and (hick)) cup)) 
-
-;(define paren-test
-;  (lambda (a lat)
-;    (cond
-      
-;      [(lat? lat) )       
-
-
-;(paren-test 'a '((a)))
-;(car(cdr '((3 5 6)(4 5 6))))
