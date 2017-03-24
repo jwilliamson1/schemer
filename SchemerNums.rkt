@@ -306,7 +306,7 @@
       [(null? l)(quote())]
       [(atom? l)
        (cond
-         [(eq? l a)(quote())]
+         [(eq? l a)'() ]
          [else l])]
       [(lat? l)
        (cond         
@@ -319,6 +319,8 @@
        (cond       
          ;recurs
          [else (cons (rember* a (car l))(rember* a (cdr l)))])])))
+
+
 
 (rember* 'sauce '(((tomato sauce))
 ((bean) sauce)
