@@ -333,4 +333,37 @@
          [(eq? (car l) a)(add1 (occur* a (cdr l)))]
          [else (occur* a (cdr l))])]
       [else(add(occur* a (car l))(occur* a (cdr l)))])))
-(occur* 'banana '((banana)(split ((((banana ice)))(cream (banana))sherbet))(banana)(bread)(banana brandy)) )
+;(occur* 'banana '((banana)(split ((((banana ice)))(cream (banana))sherbet))(banana)(bread)(banana brandy)) )
+
+(define subst*
+  (lambda (new old l)
+    (cond
+      [(null? l)(quote())]
+      [(atom? (car l))
+       (cond
+         [(eq? (car l) old)(cons new (subst* new old (cdr l)))]
+         [else(cons(car l)(subst* new old (cdr l)))])]
+      [else(cons(subst* new old (car l))(subst* new old (cdr l)))])))
+;(subst* 'orange 'banana '((banana) (split ((((banana ice))) (cream (banana)) sherbet)) (banana) (bread) (banana brandy)))
+
+(define insertL*
+  (lambda (new old l)
+    (cond
+      [(null? l)(quote())]
+      [(atom? (car l))
+       (cond
+         [(eq? (car l) old)(cons new(cons old (insertL* new old (cdr l))))]
+         [else(cons(car l)(insertL* new old (cdr l)))])]
+      [else (cons (insertL* new old (car l))(insertL* new old (cdr l)))])))
+;(insertL* 'pecker 'chuck '(((how much (wood))could((a (wood) chuck))(((chuck)))(if (a) ((wood chuck)))could chuck wood) ))
+
+(define member*
+  (lambda (a l)
+    (cond
+      [(null? l) (quote())]
+      [(atom? (car l))
+       (cond
+         [(eq? (car l) a)]
+         [else (member* a (cdr l))])]
+      [else(cons(member* a (car l))(member* a (cdr l)))])))
+(member* 'chips '((potato) (chips ((with) fish) (chips))))
