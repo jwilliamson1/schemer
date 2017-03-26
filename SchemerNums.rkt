@@ -372,9 +372,9 @@
 (define leftmost
   (lambda (l)
     (cond
-      [(null?(quote()))]
       [(atom?(car l))(car l)]
       [else(leftmost (car l))])))
 
 (leftmost '((potato) (chips ((with) fish) (chips))))
-(leftmost '(((() four)) 17 (seventeen)))
+;ERROR(leftmost '(((() four)) 17 (seventeen)))
+;ERROR(leftmost (quote()))
