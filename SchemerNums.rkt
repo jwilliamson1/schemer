@@ -360,10 +360,21 @@
 (define member*
   (lambda (a l)
     (cond
-      [(null? l) (quote())]
-      [(atom? (car l))
-       (cond
-         [(eq? (car l) a)]
-         [else (member* a (cdr l))])]
-      [else(cons(member* a (car l))(member* a (cdr l)))])))
-(member* 'chips '((potato) (chips ((with) fish) (chips))))
+      [(null? l)#f]
+      [(atom?(car l))
+       (or(eq?(car l) a)
+         (member* a (cdr l)))]
+      [else(or(member* a (car l))
+               (member* a (cdr l)))])))
+
+;(member* 'chips '((potato) (chips ((with) fish) (chips))))
+;(member* 'dip '((potato) (chips ((with) fish) (chips))))
+(define leftmost
+  (lambda (l)
+    (cond
+      [(null?(quote()))]
+      [(atom?(car l))(car l)]
+      [else(leftmost (car l))])))
+
+(leftmost '((potato) (chips ((with) fish) (chips))))
+(leftmost '(((() four)) 17 (seventeen)))
