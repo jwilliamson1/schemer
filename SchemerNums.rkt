@@ -135,7 +135,7 @@
       [else (all-nums(cdr lat))])))
 ;(all-nums '(5 pears 6 prunes 9 dates))
 
-(define equan?
+(define eqan?
   (lambda (a1 a2)
     (cond
       [(and (number? a1)(number? a2))
@@ -143,11 +143,11 @@
       [(or(number? a1)(number? a2)) #f]
       [else (eq? a1 a2)])))
 
-;(equan? 'r 'r)      
-;(equan? 'r 's)
-;(equan? 1 1)
-;(equan? 1 2)
-;(equan? 'A 1)
+;(eqan? 'r 'r)      
+;(eqan? 'r 's)
+;(eqan? 1 1)
+;(eqan? 1 2)
+;(eqan? 'A 1)
 
 (define occur
   (lambda (a lat)
@@ -155,7 +155,7 @@
       [(null? lat) 0]
       [else
        (cond
-         [(equan? (car lat) a)
+         [(eqan? (car lat) a)
           (add1(occur a (cdr lat)))]
          [else (occur a (cdr lat))])])))
           
@@ -375,6 +375,31 @@
       [(atom?(car l))(car l)]
       [else(leftmost (car l))])))
 
-(leftmost '((potato) (chips ((with) fish) (chips))))
+;(leftmost '((potato) (chips ((with) fish) (chips))))
 ;ERROR(leftmost '(((() four)) 17 (seventeen)))
 ;ERROR(leftmost (quote()))
+
+
+(define equal?
+(lambda (s1 s2)
+(cond
+((and ( atom? s1) ( atom? s2))
+( eqan? s1 s2))
+((or ( atom? s1 ) ( atom? s2))
+#f)
+(else ( eqlist? s1 s2))))) 
+
+(define eqlist?
+(lambda ( l1 l2)
+(cond
+((and ( null? l1) (null? l2)) #t )
+((or (null? l1 ) (null? l2)) #f)
+(else
+(and ( equal? ( car l1) ( car l2))
+( eqlist? ( cdr l1 ) ( cdr l2)))))))
+
+(eqlist? '(beef ((sausage)) (and (soda)))  '(beef ((pepperoni)) (and (soda))) )
+(eqlist? '(beef ((sausage)) (and (soda)))  '(beef ((sausage)) (and (soda))) )
+
+(equal? '(beef ((sausage)) (and (soda)))  '(beef ((pepperoni)) (and (soda))) )
+(equal? '(beef ((sausage)) (and (soda)))  '(beef ((sausage)) (and (soda))) )
