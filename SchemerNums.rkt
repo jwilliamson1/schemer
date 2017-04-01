@@ -379,27 +379,84 @@
 ;ERROR(leftmost '(((() four)) 17 (seventeen)))
 ;ERROR(leftmost (quote()))
 
+(define eqlist-v1?
+  (lambda (l1 l2)
+    (cond
+      [(and(null? l1)(null? l2))#t]
+      ; elim null null
+      [(and(null? l1)(atom? (car l2)))#f]
+      ;null null and null 1 atom 2 elim
+      [(null? l1) #f]
+      ;only 3rd case left where l2
+      ;also check null before checking atom car l1
+      [(and(null? l2)(atom? (car l1)))#f]
+      ;need to check null2 because we only know null null, null atom, and null list are elim
+      [(and(atom? (car l1))(atom? (car l2)))
+       (and
+        (eqan? (car l1)(car l2))(eqlist-v1? (cdr l1)(cdr l2)))]
+      ;atom atom gone
+      [(atom? (car l1))#f]       
+      ;because atom null and atom atom are gone one more option; already checked null
+      [(null? l2)]
+      ;check null l2 before checking car on it
+      ;we know if atom car l1 only thing left for l2 is a list
+      [(atom? (car l2))#f]      
+      ;null and atom elim, atom atom elim; l1 is list
+      [else(and(eqlist-v1?(car l1)(car l2))
+               (eqlist-v1?(cdr l1)(cdr l2)))])))
+                       
+;(eqlist-v1? '(beef ((sausage)) (and (soda)))  '(beef ((sausage)) (and (soda))) )
+;(eqlist-v1? '(beef ((sausage)) (and (soda)))  '(beef ((pepperoni)) (and (soda))) )
+;(eqlist-v1? '(((sausage)) (and (soda)))  '(beef ((pepperoni)) (and (soda))) )
+;(eqlist-v1? '(((sausage)) (and (soda)))  '(((pepperoni)) (and (soda))) )
+
+(define eqlist-v2?
+  (lambda (l1 l2)
+    (cond
+      [(and(null? l1)(null? l2))#t]
+      ; elim null null
+      [(or(null? l1)(null? l2))#f]
+      ;elim null and any other conidtion
+      [(and(atom? (car l1))(atom? (car l2)))
+       (and
+        (eqan? (car l1)(car l2))(eqlist-v2? (cdr l1)(cdr l2)))]
+      ;atom atom gone
+      [(or(atom? (car l1))(atom?(car l2)))#f]
+      ;because atom null and atom atom are gone one more option; already checked null
+      ;we know if atom car l1 only thing left for l2 is a list
+      
+      ;null and atom elim, atom atom elim; l1 is list
+      [else(and(eqlist-v2?(car l1)(car l2))
+               (eqlist-v2?(cdr l1)(cdr l2)))])))
+
+;(eqlist-v2? '(beef ((sausage)) (and (soda)))  '(beef ((sausage)) (and (soda))) )
+;(eqlist-v2? '(beef ((sausage)) (and (soda)))  '(beef ((pepperoni)) (and (soda))) )
+;(eqlist-v2? '(((sausage)) (and (soda)))  '(beef ((pepperoni)) (and (soda))) )
+;(eqlist-v2? '(((sausage)) (and (soda)))  '(((pepperoni)) (and (soda))) )
 
 (define equal?
-(lambda (s1 s2)
-(cond
-((and ( atom? s1) ( atom? s2))
-( eqan? s1 s2))
-((or ( atom? s1 ) ( atom? s2))
-#f)
-(else ( eqlist? s1 s2))))) 
+  (lambda (s1 s2)
+    (cond
+      [(and (atom? s1)(atom? 2))(eqan? s1 s2)]
+      [(or(atom? s1)(atom? s2))#f]
+      [else(eqlist-v2? s1 s2)])))
 
-(define eqlist?
-(lambda ( l1 l2)
-(cond
-((and ( null? l1) (null? l2)) #t )
-((or (null? l1 ) (null? l2)) #f)
-(else
-(and ( equal? ( car l1) ( car l2))
-( eqlist? ( cdr l1 ) ( cdr l2)))))))
+;(equal? '(beef ((sausage)) (and (soda)))  '(beef ((sausage)) (and (soda))) )
+;(equal? '(beef ((sausage)) (and (soda)))  '(beef ((pepperoni)) (and (soda))) )
+;(equal? '(((sausage)) (and (soda)))  '(beef ((pepperoni)) (and (soda))) )
+;(equal? '(((sausage)) (and (soda)))  '(((pepperoni)) (and (soda))) )
 
-(eqlist? '(beef ((sausage)) (and (soda)))  '(beef ((pepperoni)) (and (soda))) )
-(eqlist? '(beef ((sausage)) (and (soda)))  '(beef ((sausage)) (and (soda))) )
+(define eqlist-v3?
+  (lambda (l1 l2)
+    (cond
+      [(and(null? l1)(null? l2))#t]
+      ; elim null null
+      [(or(null? l1)(null? l2))#f]
 
-(equal? '(beef ((sausage)) (and (soda)))  '(beef ((pepperoni)) (and (soda))) )
-(equal? '(beef ((sausage)) (and (soda)))  '(beef ((sausage)) (and (soda))) )
+      [else(and(equal?(car l1)(car l2))
+               (equal?(cdr l1)(cdr l2)))])))
+
+(eqlist-v3? '(beef ((sausage)) (and (soda)))  '(beef ((sausage)) (and (soda))) )
+(eqlist-v3? '(beef ((sausage)) (and (soda)))  '(beef ((pepperoni)) (and (soda))) )
+(eqlist-v3? '(((sausage)) (and (soda)))  '(beef ((pepperoni)) (and (soda))) )
+(eqlist-v3? '(((sausage)) (and (soda)))  '(((pepperoni)) (and (soda))) )
