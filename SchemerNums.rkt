@@ -437,9 +437,11 @@
 (define equal?
   (lambda (s1 s2)
     (cond
-      [(and (atom? s1)(atom? 2))(eqan? s1 s2)]
-      [(or(atom? s1)(atom? s2))#f]
-      [else(eqlist-v2? s1 s2)])))
+      [(and (atom? s1)(atom? s2))
+       (eqan? s1 s2)]
+      [(or(atom? s1)(atom? s2)
+          )#f]
+      [else(eqlist-v3? s1 s2)])))
 
 ;(equal? '(beef ((sausage)) (and (soda)))  '(beef ((sausage)) (and (soda))) )
 ;(equal? '(beef ((sausage)) (and (soda)))  '(beef ((pepperoni)) (and (soda))) )
@@ -450,13 +452,24 @@
   (lambda (l1 l2)
     (cond
       [(and(null? l1)(null? l2))#t]
-      ; elim null null
       [(or(null? l1)(null? l2))#f]
-
-      [else(and(equal?(car l1)(car l2))
-               (equal?(cdr l1)(cdr l2)))])))
+      [else
+       (and(equal?(car l1)(car l2))
+               (eqlist-v3?(cdr l1)(cdr l2)))])))
 
 (eqlist-v3? '(beef ((sausage)) (and (soda)))  '(beef ((sausage)) (and (soda))) )
 (eqlist-v3? '(beef ((sausage)) (and (soda)))  '(beef ((pepperoni)) (and (soda))) )
 (eqlist-v3? '(((sausage)) (and (soda)))  '(beef ((pepperoni)) (and (soda))) )
 (eqlist-v3? '(((sausage)) (and (soda)))  '(((pepperoni)) (and (soda))) )
+
+(define remberS
+  (lambda (s l)
+    (cond
+      ((null? l) (quote ()))
+      
+              (( equal? ( car l) s) ( cdr l))
+              (else (cons ( car l)
+                          (remberS s
+                                   ( cdr l)))))))
+
+(remberS '((sausage)) '(((sausage)) (and (soda))))
