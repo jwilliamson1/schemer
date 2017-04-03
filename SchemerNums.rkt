@@ -398,8 +398,35 @@
 (and ( equal? ( car l1) ( car l2))
 ( eqlist? ( cdr l1 ) ( cdr l2)))))))
 
-(eqlist? '(beef ((sausage)) (and (soda)))  '(beef ((pepperoni)) (and (soda))) )
-(eqlist? '(beef ((sausage)) (and (soda)))  '(beef ((sausage)) (and (soda))) )
+;(eqlist? '(beef ((sausage)) (and (soda)))  '(beef ((pepperoni)) (and (soda))) )
+;(eqlist? '(beef ((sausage)) (and (soda)))  '(beef ((sausage)) (and (soda))) )
 
-(equal? '(beef ((sausage)) (and (soda)))  '(beef ((pepperoni)) (and (soda))) )
-(equal? '(beef ((sausage)) (and (soda)))  '(beef ((sausage)) (and (soda))) )
+;(equal? '(beef ((sausage)) (and (soda)))  '(beef ((pepperoni)) (and (soda))) )
+;(equal? '(beef ((sausage)) (and (soda)))  '(beef ((sausage)) (and (soda))) )
+
+(define eqlist2?
+  (lambda (L1 L2)
+    (cond
+      [(and(null? L1)(null? L2))
+       #t]
+      [(and(null? L1)(atom? (car L2)))
+       #f]
+      [(null? L1) #f]
+      [(and(atom? (car L1))(null? L2))
+       #f])))
+
+    
+;(eqlist2? '(beef ((sausage)) (and (soda)))  '(beef ((pepperoni)) (and (soda))) )
+;(eqlist2? '(beef ((sausage)) (and (soda)))  '(beef ((sausage)) (and (soda))) )
+
+(define numbered?
+(lambda ( aexp)
+(cond
+(( atom? aexp) (number? aexp))
+(else
+(and (numbered? ( car aexp))
+(numbered?
+( car ( cdr ( cdr aexp))))))))) 
+
+(numbered? '(1 'cookie 5))
+(numbered? '((1 * 4) + 5))
