@@ -13,11 +13,21 @@
     [else #f]
     )))
 
+
+(define equal?
+(lambda (s1 s2)
+(cond
+((and ( atom? s1) ( atom? s2))
+( eqan? s1 s2))
+((or ( atom? s1 ) ( atom? s2))
+#f)
+(else ( eqlist? s1 s2))))) 
+
 (define member?
   (lambda (a lat)
     (cond
       ((null? lat) #f)
-      (else (or (eq? (car lat) a)
+      (else (or (equal? (car lat) a)
                 (member? a (cdr lat)))))))
 ;(member? 'meat (list 'mashed 'potatoes' 'and 'meat 'and 'gravy))
 ;(member? 'tar (list 'mashed 'potatoes' 'and 'meat 'and 'gravy))
@@ -380,14 +390,6 @@
 ;ERROR(leftmost (quote()))
 
 
-(define equal?
-(lambda (s1 s2)
-(cond
-((and ( atom? s1) ( atom? s2))
-( eqan? s1 s2))
-((or ( atom? s1 ) ( atom? s2))
-#f)
-(else ( eqlist? s1 s2))))) 
 
 (define eqlist?
 (lambda ( l1 l2)
@@ -471,8 +473,17 @@
        [else ( ^ (value (1st-sub-exp nexp))
                  ( value
                    (2nd-sub-exp nexp)))])))
-(value '(+ 3 1))
-(value (+(+ 5 2)(^ 4 2)))
+;(value '(+ 3 1))
+;(value (+(+ 5 2)(^ 4 2)))
 ;(value '((5 + 2) + (4 ^ 2)))
 
+(define set??
+  (lambda (l)
+    (cond
+      [(null? l) #t]
+      [(member? (car l)(cdr l))#f]
+      [else (set?? (cdr l))])))
+              
+(set?? '(boo to a bee a boo))
+(set?? '(apple 3 pear 4 9 apple 3 4))
 
