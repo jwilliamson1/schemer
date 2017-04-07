@@ -483,7 +483,49 @@
       [(null? l) #t]
       [(member? (car l)(cdr l))#f]
       [else (set?? (cdr l))])))
-              
-(set?? '(boo to a bee a boo))
-(set?? '(apple 3 pear 4 9 apple 3 4))
+             
+;(set?? '(boo to a bee a boo))
+;(set?? '(apple 3 pear 4 9 apple 3 4))
 
+(define makeset
+  (lambda (l)
+    (cond
+      [(null? l)(quote())]
+      [else(cons(car l)(multirember (car l)(makeset(cdr l))
+                ))])))
+
+;(makeset ' (apple peach pear peach plum apple lemon peach) )
+;(makeset '(apple 3 pear 4 9 apple 3 4) )
+
+(define makesetwrong
+  (lambda ( lat)
+    (cond
+      ((null? lat) (quote ()))
+      ((member? ( car lat) ( cdr lat))
+       ( makesetwrong ( cdr lat)))
+      (else ( cons ( car lat)
+                   ( makesetwrong ( cdr lat)))))))
+
+;(makesetwrong ' (apple peach pear peach plum apple lemon peach) )
+;(makesetwrong '(apple 3 pear 4 9 apple 3 4) )
+(define makeset_inv
+  (lambda (l)
+    (cond
+      [(null? l)(quote())]
+      [else
+            (cons(car l)(makeset_inv(multirember (car l)(cdr l))))])))
+
+;(makeset_inv ' (apple peach pear peach plum apple lemon peach) )
+;(makeset_inv '(apple 3 pear 4 9 apple 3 4) )
+
+(define subset?
+  (lambda (l1 l2)
+    (cond
+      [(null? l1)#t]
+      [else
+       (and
+            (member?(car l1)l2)
+            (subset?(cdr l1)l2))])))
+
+(subset? '(5 chicken wings) '(5 hamburgers 2 pieces fried chicken and light duckling wings) )
+(subset? '(4 pounds of horseradish) '(four pounds chicken and 5 ounces horseradish) )
