@@ -527,5 +527,47 @@
             (member?(car l1)l2)
             (subset?(cdr l1)l2))])))
 
-(subset? '(5 chicken wings) '(5 hamburgers 2 pieces fried chicken and light duckling wings) )
-(subset? '(4 pounds of horseradish) '(four pounds chicken and 5 ounces horseradish) )
+;(subset? '(5 chicken wings) '(5 hamburgers 2 pieces fried chicken and light duckling wings) )
+;(subset? '(4 pounds of horseradish) '(four pounds chicken and 5 ounces horseradish) )
+
+(define eqset?
+  (lambda (set1 set2)
+    (and(subset? set1 set2)
+        (subset? set2 set1))))
+
+;(eqset? '(junior bacon chee) '(chee junior bacon))
+;(eqset? '(junior bacon chee) '(chee junior bacon terd))
+
+(define intersect?
+  (lambda (set1 set2)
+    (cond
+      [(null? set1) #f]
+      [else(or(member? (car set1) set2)
+               (intersect? (cdr set1) set2))])))
+
+;(intersect? '(the truth and the lies) '(when a man lies he murders in part of the world))
+;(intersect? '(the truth and the lies) '(when the man murders in part of world))
+
+(define intersect
+  (lambda (set1 set2)
+    (cond
+      [(null? set1) (quote())]
+      [(member? (car set1) set2)(cons(car set1)(intersect (cdr set1) set2))]
+      [else(intersect (cdr set1) set2)])))
+                
+;(intersect '(stewed tomatoes and macaroni) '(macaroni and cheese))
+;(intersect '(macaroni and cheese) '(stewed tomatoes and macaroni))
+
+(define union
+  (lambda (set1 set2)
+    (cond
+      [(null? set2)(quote())]
+      [(null? set1)(union set2 set1)]
+      [(member? (car set1) set2)
+       (union (cdr set1) set2)]
+      [else(cons(car set1)(union(cdr set1) set2))])))
+
+                                   
+      
+(union '(stewed tomatoes and macaroni casserole) '(macaroni and cheese))
+;result (stewed tomatoes casserole macaroni and cheese) 

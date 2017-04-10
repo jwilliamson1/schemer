@@ -13,11 +13,21 @@
     [else #f]
     )))
 
+
+(define equal?
+(lambda (s1 s2)
+(cond
+((and ( atom? s1) ( atom? s2))
+( eqan? s1 s2))
+((or ( atom? s1 ) ( atom? s2))
+#f)
+(else ( eqlist? s1 s2))))) 
+
 (define member?
   (lambda (a lat)
     (cond
       ((null? lat) #f)
-      (else (or (eq? (car lat) a)
+      (else (or (equal? (car lat) a)
                 (member? a (cdr lat)))))))
 ;(member? 'meat (list 'mashed 'potatoes' 'and 'meat 'and 'gravy))
 ;(member? 'tar (list 'mashed 'potatoes' 'and 'meat 'and 'gravy))
@@ -380,14 +390,6 @@
 ;ERROR(leftmost (quote()))
 
 
-(define equal?
-(lambda (s1 s2)
-(cond
-((and ( atom? s1) ( atom? s2))
-( eqan? s1 s2))
-((or ( atom? s1 ) ( atom? s2))
-#f)
-(else ( eqlist? s1 s2))))) 
 
 (define eqlist?
 (lambda ( l1 l2)
@@ -428,5 +430,110 @@
 (numbered?
 ( car ( cdr ( cdr aexp))))))))) 
 
-(numbered? '(1 'cookie 5))
-(numbered? '((1 * 4) + 5))
+;(numbered? '(1 'cookie 5))
+;(numbered? '((1 * 4) + 5))
+
+(define ^
+  (lambda (b p)
+    (cond
+      [(eq? p 0)1]
+      [else(* b (^ b (- p 1)))])))
+
+; (define sq
+;   (lambda (b p p)
+;     
+; (define sq-itr
+;       (lambda (b p acc)
+;         (cond
+;           [(eq? p 0) 1]
+;           [else b (sq-itr b(- p 1) 
+
+(define 1st-sub-exp
+  ;function assumes that the first subexpression is an arithmetic 
+  (lambda(aexp)
+    (car(cdr aexp))))
+  (define 2nd-sub-exp
+  ;function assumes that the first subexpression is an arithmetic 
+  (lambda(aexp)
+    (car(cdr (cdr aexp)))))
+(define operator
+  (lambda (aexp)
+    (car aexp)))
+    
+(define value 
+  (lambda (nexp)
+    (cond
+      [(atom? nexp) nexp]
+      [(eq?(operator nexp)(quote +))
+       (+(value(1st-sub-exp nexp))
+         (value(2nd-sub-exp nexp)))]
+      [(eq?(operator nexp)(quote *))
+           (*(value (1st-sub-exp nexp))
+             (value(cdr(cdr nexp))))]
+       [else ( ^ (value (1st-sub-exp nexp))
+                 ( value
+                   (2nd-sub-exp nexp)))])))
+;(value '(+ 3 1))
+;(value (+(+ 5 2)(^ 4 2)))
+;(value '((5 + 2) + (4 ^ 2)))
+
+(define set??
+  (lambda (l)
+    (cond
+      [(null? l) #t]
+      [(member? (car l)(cdr l))#f]
+      [else (set?? (cdr l))])))
+             
+;(set?? '(boo to a bee a boo))
+;(set?? '(apple 3 pear 4 9 apple 3 4))
+
+(define makeset
+  (lambda (l)
+    (cond
+      [(null? l)(quote())]
+      [else(cons(car l)(multirember (car l)(makeset(cdr l))
+                ))])))
+
+;(makeset ' (apple peach pear peach plum apple lemon peach) )
+;(makeset '(apple 3 pear 4 9 apple 3 4) )
+
+(define makesetwrong
+  (lambda ( lat)
+    (cond
+      ((null? lat) (quote ()))
+      ((member? ( car lat) ( cdr lat))
+       ( makesetwrong ( cdr lat)))
+      (else ( cons ( car lat)
+                   ( makesetwrong ( cdr lat)))))))
+
+;(makesetwrong ' (apple peach pear peach plum apple lemon peach) )
+;(makesetwrong '(apple 3 pear 4 9 apple 3 4) )
+(define makeset_inv
+  (lambda (l)
+    (cond
+      [(null? l)(quote())]
+      [else
+            (cons(car l)(makeset_inv(multirember (car l)(cdr l))))])))
+
+;(makeset_inv ' (apple peach pear peach plum apple lemon peach) )
+;(makeset_inv '(apple 3 pear 4 9 apple 3 4) )
+
+(define subset?
+  (lambda (l1 l2)
+    (cond
+      [(null? l1)#t]
+      [else
+       (and
+            (member?(car l1)l2)
+            (subset?(cdr l1)l2))])))
+
+;(subset? '(5 chicken wings) '(5 hamburgers 2 pieces fried chicken and light duckling wings) )
+;(subset? '(4 pounds of horseradish) '(four pounds chicken and 5 ounces horseradish) )
+
+(define eqset?
+  (lambda (set1 set2)
+    (and(subset? set1 set2)
+        (subset? set2 set1))))
+
+(eqset? '(junior bacon chee) '(chee junior bacon))
+(eqset? '(junior bacon chee) '(chee junior bacon terd))
