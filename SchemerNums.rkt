@@ -562,12 +562,34 @@
   (lambda (set1 set2)
     (cond
       [(null? set2)(quote())]
-      [(null? set1)(union set2 set1)]
+      [(null? set1)set2]
       [(member? (car set1) set2)
        (union (cdr set1) set2)]
       [else(cons(car set1)(union(cdr set1) set2))])))
 
                                    
       
-(union '(stewed tomatoes and macaroni casserole) '(macaroni and cheese))
-;result (stewed tomatoes casserole macaroni and cheese) 
+;(union '(stewed tomatoes and macaroni casserole) '(macaroni and cheese))
+;result (stewed tomatoes casserole macaroni and cheese)
+
+(define set-diff
+  (lambda (set1 set2)
+    (cond
+      
+      [(null? set1)(quote())]
+      [(member? (car set1) set2)
+       (set-diff (cdr set1) set2)]
+      [else(cons(car set1)(set-diff(cdr set1) set2))])))
+
+;(set-diff '(stewed tomatoes and macaroni casserole) '(macaroni and cheese))
+(define intersectall
+  (lambda (l-set)
+    (cond
+      [(null? (cdr l-set))(car l-set)]
+      [else (intersect(car l-set)(intersectall(cdr l-set)))
+                 ])))
+
+(intersectall    '( ( 6 pears and prunes)
+(3 peaches and 6 peppers prunes)
+(8 pears and 6 plums prunes)
+(and 6 prunes with some apples prunes)) )
