@@ -589,7 +589,41 @@
       [else (intersect(car l-set)(intersectall(cdr l-set)))
                  ])))
 
-(intersectall    '( ( 6 pears and prunes)
-(3 peaches and 6 peppers prunes)
-(8 pears and 6 plums prunes)
-(and 6 prunes with some apples prunes)) )
+;(intersectall    '( ( 6 pears and prunes)
+;(3 peaches and 6 peppers prunes)
+;(8 pears and 6 plums prunes)
+;(and 6 prunes with some apples prunes)) )
+
+
+(define a-pair?
+  (lambda (x)
+    (cond
+      [(atom? x)#f]
+      [(null? x)#f]
+      [(null? (cdr x))#f]
+      [(null? (cdr (cdr x)))#t]
+      [else #f])))
+
+(a-pair? '(3 7))
+(a-pair? '((2) (pair)))
+(a-pair? '(full (house)) )
+
+
+(define first
+  (lambda (l)
+    (car (l))))
+
+(define second
+  (lambda (l)
+    (car (cdr l))))
+
+(define third
+  (lambda (l)
+    (car (cdr (cdr l)))))
+
+(define build
+  (lambda (s1 s2)
+    (cons s1 (cons s2 (quote())))))
+
+(build 'test 'ify)
+(build 'funky '(town))
