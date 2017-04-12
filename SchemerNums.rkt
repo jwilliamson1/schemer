@@ -484,8 +484,8 @@
       [(member? (car l)(cdr l))#f]
       [else (set?? (cdr l))])))
              
-(set?? '(boo to a bee a boo))
-(set?? '(apple 3 pear 4 9 apple 3 4))
+;(set?? '(boo to a bee a boo))
+;(set?? '(apple 3 pear 4 9 apple 3 4))
 
 (define makeset
   (lambda (l)
@@ -611,19 +611,24 @@
 
 (define first
   (lambda (l)
-    (car (l))))
+    (cond
+      (else (car l)))))
 
 (define second
-  (lambda (l)
-    (car (cdr l))))
+  (lambda (p)
+    (cond
+      (else ( car ( cdr p)))))) 
 
 (define third
   (lambda (l)
     (car (cdr (cdr l)))))
 
 (define build
-  (lambda (s1 s2)
-    (cons s1 (cons s2 (quote())))))
+  (lambda (sl s2)
+    (cond
+      (else ( cons sl
+                   ( cons s2 (quote ()))))))) 
+
 
 ;(build 'test 'ify)
 ;(build 'funky '(town))
@@ -632,15 +637,77 @@
   (lambda (rel)
     (set??(firsts rel))))
 
-(fun? '((apples peaches)(pumpkin pie)(apples peaches)) )
-(fun? '((4 3) (4 2) (7 6) (6 2) (3 4)) )
-(fun? '((8 3) (4 2) (7 6) (6 2) (3 4)) )
+;(fun? '((apples peaches)(pumpkin pie)(apples peaches)) )
+;(fun? '((4 3) (4 2) (7 6) (6 2) (3 4)) )
+;(fun? '((8 3) (4 2) (7 6) (6 2) (3 4)) )
+
+(define revpair
+  (lambda (pair)
+    (cond
+      [else (build (second pair)
+                   (first pair))])))
+
 
 (define revrel
- (lambda (rel)
-   (cond
-     [(null? rel)(quote())]
-     [else (cons (second (car rel))
-                 (first (car rel)))])))
+  (lambda (rel)
+    (cond
+      [(null? rel)(quote())]
+      [else(cons(revpair(car rel)) (revrel(cdr rel)))])))
 
-(revrel '((8 a) (pumpkin pie) (got sick)) )
+;(revrel '((8 a) (pumpkin pie) (got sick)) )
+
+(define seconds
+  (lambda (l)
+    (cond
+      [(null? l)(quote())]
+      [else(cons(second(car l))
+           (seconds(cdr l)))])))
+
+;(seconds '((grape raisin)(plum prune)(stewed prune)))
+
+(define fullfun
+  (lambda (rel)
+    (set??(seconds rel))))
+
+;(fullfun '((grape raisin)(plum prune)(stewed prune)) )
+;(fullfun '((grape raisin)(plum prune)(stewed grape)) )
+
+(define one-to-one
+  (lambda (fun)
+    (fun?(revrel fun))))
+
+;(one-to-one '((grape raisin)(plum prune)(stewed prune)) )
+;(one-to-one '((grape raisin)(plum prune)(stewed grape)) )
+
+(define rember-ff
+  (lambda (test? a l)
+    (cond
+      [(null? l)(quote())]
+      [(test? (car l) a)(cdr l)]
+      [else(cons(car l)(rember-ff test? a l))])))
+
+(define rember-f
+  (lambda (test?)
+    (lambda (a l)
+      (cond
+        [(null? l)(quote())]
+        [(test? (car l) a)(cdr l)]
+        [else (cons (car l)(rember-f test?)a
+                    (cdr l))]))))
+
+;(rember-f eq? 'a '(a lever is never forever))
+;(rember-f equal? 'a '(a lever is never forever))
+
+(define eq?-c
+  (lambda(a)
+    (lambda (x)
+      (eq? x a))))
+(define eq?-salad (eq?-c 'salad))
+
+;(eq?-salad 'salad)
+;(eq?-salad 'tuna)
+
+;((eq?-c 'salad)'salad)
+;((eq?-c 'salad)'tuna)
+(define rember-eq (rember-f eq?))
+(rember-eq 'a '(a lever is never forever))
