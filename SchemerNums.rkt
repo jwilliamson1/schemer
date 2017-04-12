@@ -484,8 +484,8 @@
       [(member? (car l)(cdr l))#f]
       [else (set?? (cdr l))])))
              
-;(set?? '(boo to a bee a boo))
-;(set?? '(apple 3 pear 4 9 apple 3 4))
+(set?? '(boo to a bee a boo))
+(set?? '(apple 3 pear 4 9 apple 3 4))
 
 (define makeset
   (lambda (l)
@@ -604,9 +604,9 @@
       [(null? (cdr (cdr x)))#t]
       [else #f])))
 
-(a-pair? '(3 7))
-(a-pair? '((2) (pair)))
-(a-pair? '(full (house)) )
+;(a-pair? '(3 7))
+;(a-pair? '((2) (pair)))
+;(a-pair? '(full (house)) )
 
 
 (define first
@@ -625,5 +625,22 @@
   (lambda (s1 s2)
     (cons s1 (cons s2 (quote())))))
 
-(build 'test 'ify)
-(build 'funky '(town))
+;(build 'test 'ify)
+;(build 'funky '(town))
+ 
+(define fun?
+  (lambda (rel)
+    (set??(firsts rel))))
+
+(fun? '((apples peaches)(pumpkin pie)(apples peaches)) )
+(fun? '((4 3) (4 2) (7 6) (6 2) (3 4)) )
+(fun? '((8 3) (4 2) (7 6) (6 2) (3 4)) )
+
+(define revrel
+ (lambda (rel)
+   (cond
+     [(null? rel)(quote())]
+     [else (cons (second (car rel))
+                 (first (car rel)))])))
+
+(revrel '((8 a) (pumpkin pie) (got sick)) )
