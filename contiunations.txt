@@ -1,0 +1,53 @@
+1st recur =
+(multirember&co
+	(quote tuna)
+	()
+	(lambda (newlat seen)
+ 	  (a-friend newlat
+		(cons (quote tuna) seen)))))
+next cond lat = null so above lambda is applied to 
+(quote() quote())
+	
+((lambda (newlat seen)
+ 	  (a-friend newlat
+		(cons (quote tuna) seen)))))(quote() quote()))
+
+sub
+
+((lambda (newlat seen)
+	(a-friend (quote())
+		(cons (quote tuna) (quote()))))
+
+(and tuna)
+
+1st recursion
+(multirember&co
+	(quote tuna)
+	(tuna)	
+	(lambda (newlat seen)
+		(a-friend(cons (quote and) newlat)
+			(seen))))))
+cond eq so sub
+(multirember&co
+	(quote tuna)
+	()	
+	(lambda (newlat seen)
+		( (lambda (newlat seen)
+			(a-friend(cons (quote and) newlat)
+			(seen)))))) newlat
+			(cons (quote tuna) seen))))
+
+next cond lat = null so above lambda is applied to 
+	(lambda (newlat seen)
+		( (lambda (newlat seen)
+			(a-friend(cons (quote and) newlat)
+			(seen)))))) newlat
+			(cons (quote tuna) seen))))(quote() quote()))
+
+sub 
+	(lambda (quote() quote())
+		( (lambda (quote() quote())
+			(a-friend(cons (quote and) quote())
+			(quote())))))) newlat
+			(cons (quote tuna) quote()))))(quote() quote()))
+
