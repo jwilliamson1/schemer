@@ -33,21 +33,28 @@ cond eq so sub
 	()	
 	(lambda (newlat seen)
 		( (lambda (newlat seen)
-			(a-friend(cons (quote and) newlat)
-			(seen)))))) newlat
-			(cons (quote tuna) seen))))
+			(a-friend
+			(cons (quote and) newlat)
+			(seen)))))) 
+			newlat(cons (quote tuna) seen))))
 
 next cond lat = null so above lambda is applied to 
 	(lambda (newlat seen)
 		( (lambda (newlat seen)
 			(a-friend(cons (quote and) newlat)
-			(seen)))))) newlat
-			(cons (quote tuna) seen))))(quote() quote()))
+			(seen)))))) 
+			newlat(cons (quote tuna) seen))))(quote() quote()))
 
 sub 
 
 		( (lambda (quote() quote())
 			(a-friend(quote and)
-			(quote())))))) (quote())
-			(cons (quote tuna) (quote()))))
+			(quote())))))) --function end
+			(quote())(tuna))
+
+
+		((lambda (quote tuna))
+			(a-friend(and)
+			(tuna)))))) --function end
+	
 
