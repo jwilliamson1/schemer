@@ -45,9 +45,9 @@ next cond lat = null so above lambda is applied to
 			(cons (quote tuna) seen))))(quote() quote()))
 
 sub 
-	(lambda (quote() quote())
+
 		( (lambda (quote() quote())
-			(a-friend(cons (quote and) quote())
-			(quote())))))) newlat
-			(cons (quote tuna) quote()))))(quote() quote()))
+			(a-friend(quote and)
+			(quote())))))) (quote())
+			(cons (quote tuna) (quote()))))
 
