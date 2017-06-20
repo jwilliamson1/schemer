@@ -58,3 +58,10 @@ sub
 			(tuna)))))) --function end
 	
 
+(picking)
+(cherry picking daddies)
+(a-friend)
+
+	(defin e1st-rec
+		(lambda (newlat see)
+			
