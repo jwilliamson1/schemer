@@ -7,7 +7,7 @@
 ;; DATA EXAMPLES
 ;(make-circle (make-posn 1 1) 100 'red)
 ;(make-circle (make-posn 10 10) 40 'blue)
-(define example-circle1 (make-circle(make-posn 10 10) 1 'blue))
+
 
 (define (draw-a-circle c)
   (draw-circle (circle-center c)
@@ -65,8 +65,6 @@
     (move-circle 10
       (move-circle 10
 	(move-circle 10 test-circle)))))
-
-
 
 ;; A rectangle is a structure:
 ;;   (make-rectangle P W H)
@@ -155,32 +153,3 @@
 (draw-a-rectangle example-rectangle2)
 (clear-a-rectangle example-rectangle1)
 (clear-a-rectangle example-rectangle2)
-
-(define (perimeter-circle a-circle)
-  (* (* (circle-radius a-circle))pi))
-
-(define (perimeter-square a-square)
-  (* (square-length a-square) 4))
-
-(define (perimeter-rectangle a-rectangle)
-  (+ (* (rectangle-height a-rectangle) 2)(* (rectangle-width a-rectangle) 2)))
-
-(define-struct square (nw length))
-
-(define (perimeter a-shape)
-  (cond
-    [(circle? a-shape)
-     (perimeter-circle a-shape)]
-    [(square? a-shape)
-     (perimeter-square a-shape)]
-    [(rectangle? a-shape)
-     (perimeter-rectangle a-shape)]))
-
-(perimeter example-rectangle1)
-(perimeter example-circle1)
-
-(define (draw-losh a-losh)
-  (cond
-    [(null? a-losh)empty]
-    [(else (and(draw-shape (car a-losh))
-               (draw-losh(cdr a-losh))))]))
