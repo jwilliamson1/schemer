@@ -1,0 +1,13 @@
+(define (add-1 n) ;returns
+   (lambda (f)(lambda (x) (f ((n f) x)))))
+
+(define zero (lambda (fn) (lambda (x) x)))
+
+(define (add-1 zero) ;returns
+   (lambda (f)(lambda (x) (f ((zero f) x)))))
+
+(define (add-1 (lambda (fn) (lambda (x) x))) ;returns
+   (lambda (f)(lambda (x) (f (((lambda (fn) (lambda (x) x)) f) x)))))
+
+(define (add-1 (lambda (fn) (lambda (x) x))) ;returns
+   (lambda (f)(lambda (x) (f ((lambda (f) (lambda (x) x)) x)))))

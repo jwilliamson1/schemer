@@ -1,0 +1,29 @@
+(define (cons x y) 
+  (lambda (m) (m x y)))
+
+(define (car z) 
+  (z (lambda (p q) p)))
+
+(define (car z) 
+  (z (lambda (p q) q)))
+
+(cons 9 1)
+ (lambda (m)(m 9 1))
+
+(car (cons 9 1))
+  (cons 9 1 (lambda(p q) p)))
+
+(car (cons 9 1))
+  ((lambda (m) (m x y))(lambda(p q) p)))
+
+(car (cons 9 1))
+  ((lambda (m) (m 9 1))(lambda(p q) p)))
+
+(car (cons 9 1))
+ ((lambda(p q) p) 9 1)))
+
+(car (cons 9 1))
+ (9)
+
+
+  
