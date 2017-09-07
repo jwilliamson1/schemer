@@ -19,9 +19,9 @@
     (else(cons (car list)(remove-door n (cdr list))))))
 
 
-;(pick 1 '(alpha delta doggmega))
-;(pick 2 '(alpha delta doggmega))
-;(pick 3 '(alpha delta doggmega))
+;(pick 1 '(alpha delta dog))
+;(pick 2 '(alpha delta dog))
+;(pick 3 '(alpha delta dog))
 
 (define (a-trial)
   
@@ -66,12 +66,12 @@
 
 (define (monty-hall n)
   (define total-trials n)
-  (define (monty-hall-iter n right wrong)
+  (define (monty-hall-iter n right)
     (cond
       ((= n 0)(newline)(newline)(display "ratio correct: ")(display (/ right total-trials)))
-      ((a-trial)(newline)(display "correct")(monty-hall-iter (- n 1) (+ 1 right) wrong))
-      (else (newline)(display "incorrect")(monty-hall-iter (- n 1) right (+ 1 wrong)))))
-  (monty-hall-iter n 0 0))
+      ((a-trial)(newline)(display "correct")(monty-hall-iter (- n 1) (+ 1 right)))
+      (else (newline)(display "incorrect")(monty-hall-iter (- n 1) right))))
+  (monty-hall-iter n 0))
 
 ;run simulation 1000 times
 (monty-hall 1000)

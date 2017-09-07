@@ -11,3 +11,17 @@
 
 (define (add-1 (lambda (fn) (lambda (x) x))) ;returns
    (lambda (f)(lambda (x) (f ((lambda (f) (lambda (x) x)) x)))))
+----
+(define (add-1 n) ;returns
+   (lambda (f)(lambda (x) (f ((n f) x)))))
+
+(define one (lambda (fn) (lambda (x) (fn x))))
+
+(define (add-1 (lambda (fn) (lambda (x) (fn x)))) ;returns
+  (lambda (f)(lambda(x)(f ((lambda (fn) (lambda (x) (fn x))) f) x)))))
+
+(define (add-1 (lambda (fn) (lambda (x) (fn x)))) ;returns
+  (lambda (f)(lambda(x)(f ((lambda (x) (f x)) x)))))
+
+(define (add-1 (lambda (fn) (lambda (x) (fn x)))) ;returns
+  (lambda (f)(lambda(x)(f (f x))))
