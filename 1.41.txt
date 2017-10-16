@@ -1,0 +1,14 @@
+(lamdba (x)
+  ((double double)((double double) inc) 5)
+
+
+(double1 (double2 double3)
+ (lambda1(x)
+  (lambda2(x)(lambda3(x)(inc(inc))
+  	     		(inc(inc))
+ (lambda1(x)
+  (lambda2(x)(lambda3(x)(inc(inc))
+	     		(inc(inc))
+
+(double2 (lambda (x)(f (f x)))
+ 
