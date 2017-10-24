@@ -1,5 +1,8 @@
 #lang racket
 
+(define identity
+  (lambda (x) x))
+
 (define (inc x)
   (+ x 1))
 
@@ -154,16 +157,25 @@
  (define (n-fold-smooth f n)  
    ((repeated smooth n) f))  
 
-(((repeated smooth 16)square)2)
+;(((repeated smooth 16)square)2)
+
+(define smooth-sq ((repeated smooth 1)square))
+(smooth-sq 2)
+
+((smooth (smooth square))2)
 
 
+(square 2)
+(square (+ 2 dx))
+(square (- 2 dx))
+;demonstrate smooth being applied to an already smooth square 
+(/ (+(identity 4)
+     (identity (+ 4.0000400001 dx))
+     (identity(- 3.9999600000999997 dx)))
+   3)
 
 
-
-
-
-
-
+      
 
 
 
