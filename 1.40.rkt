@@ -143,15 +143,11 @@
   (- n 1))
 
 (sub1 234)
-;works
 
 (define (repeated f n)
   (cond((= n 0)(λ(x)x))
        ((even? n)(repeated(compose f f)(/ n 2)))
        (else(compose f (repeated f (- n 1))))))
-
-;(repeated square 1)5)
-;((repeated square 2)5)
 
 (define (smooth f)
   (lambda (x)
@@ -163,8 +159,6 @@
  (define (n-fold-smooth f n)  
    ((repeated smooth n) f))  
 
-;(((repeated smooth 16)square)2)
-
 (define smooth-sq ((repeated smooth 3)square))
 
 (define (cube-root x)
@@ -175,68 +169,13 @@
 
 (display "Cube root of 27 is 3 ")(cube-root 27)
 
-(define (4th-root x)
-  (fixed-point-of-transform
-   (lambda(y)(/ x (expt y 3)))
-   (repeated average-damp 2)
-   1.0))
-
-(display "4th root of 81 is 3 ")(4th-root 81)
-
-(define (5th-root x)
-  (fixed-point-of-transform
-   (lambda(y)(/ x (expt y 4)))
-   (repeated average-damp 2)
-   1.0))
-
-(display "5th root of 32 is 2 ")(5th-root 32)
-
-(define (6th-root x)
-  (fixed-point-of-transform
-   (lambda(y)(/ x (expt y 5)))
-   (repeated average-damp 2)
-   1.0))
-
-(display "6th root of 64 is 2 ")(6th-root 64)
-
-(define (8th-root x)
-  (fixed-point-of-transform
-   (lambda(y)(/ x (expt y 7)))
-   (repeated average-damp 3)
-   1.0))
-
-(display "8th root of 256 is 2 ")(8th-root 256)
-
-(define (16th-root x)
-  (fixed-point-of-transform
-   (lambda(y)(/ x (expt y 15)))
-   (repeated average-damp 4)
-   1.0))
-
-(display "16th root of 65536 is 2 ")(16th-root 65536)
-
-(define (32th-root x)
-  (fixed-point-of-transform
-   (lambda(y)(/ x (expt y 31)))
-   (repeated average-damp 5)
-   1.0))
-
-(display "32th root of 4294967296 is 2 ")(32th-root 4294967296)
-
-(define (63th-root x)
-  (fixed-point-of-transform
-   (lambda(y)(/ x (expt y 62)))
-   (repeated average-damp 5)
-   1.0))
-
-(display "64th root of 9223372036854775808 is 2 ")(63th-root 9223372036854775808)
 
 (define (nth-root n x)
   (fixed-point-of-transform
    (λ (y)(/ x (expt y (- n 1))))
    (repeated average-damp (floor(logB n 2)))
    1.0))
-(floor(logB 64 2))
+
 (nth-root 6 64)
 
 ;(display "thrice: ")(smooth-sq 2)
