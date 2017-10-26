@@ -18,21 +18,56 @@
 
 (define tolerance 0.00001)
 
-(define (fixed-point f first-guess)
-  (define (close-enough? v1 v2)
-    (< (abs (- v1 v2)) 
-       tolerance))
-  (define (try guess)
-    (let ((next (f guess)))
-      (if (close-enough? guess next)
-          next
-          (try next))))
-  (try first-guess))
+;original method
+;(define (fixed-point f first-guess)
+;  (define (close-enough? v1 v2)
+;    (< (abs (- v1 v2)) 
+;       tolerance))
+;  (define (try guess)
+;    (let ((next (f guess)))
+;      (if (close-enough? guess next)
+;          next
+;          (try next))))
+;  (try first-guess))
 
+(define (fixed-point improve first-guess)  
+    (define (close-enough? v1 v2)
+      (< (abs (- v1 v2)) 
+         tolerance))
+    ((iterative-improvement close-enough? improve)first-guess))
+
+(define (iterative-improvement good-enough? improve)
+  (λ (first-guess)
+    (define (try guess)
+      (let ((next (improve guess)))
+        (if (good-enough? guess next)
+            next
+            (try next))))
+    (try first-guess)))
+
+(define (sqrt x)
+  (define (improve guess)
+    (λ (guess)
+      (average guess (/ x guess))))
+  (define (good-enough? guess x)
+    (< (abs (- (square guess) x)) 0.001))
+  ((iterative-improvement good-enough? improve) 1.0))
+
+(display "should be 10 ")(sqrt 100)
+    
 
 (define (average-damp f)
   (lambda (x) 
     (average x (f x))))
+
+(define (newtons-method g guess)
+  (fixed-point (newton-transform g) 
+               guess))
+
+(define (newton-transform g)
+  (lambda (x)
+    (- x (/ (g x) 
+            ((deriv g) x)))))
 
 
 ((average-damp square)5) ;15
@@ -60,20 +95,15 @@
 
 (display "75.00014999664018")((deriv cube) 5)
 
-(define (newton-transform g)
-  (lambda (x)
-    (- x (/ (g x) 
-            ((deriv g) x)))))
 
-(define (newtons-method g guess)
-  (fixed-point (newton-transform g) 
-               guess))
 
-(define (sqrt x)
-  (newtons-method 
-   (lambda (y) 
-     (- (square y) x)) 
-   1.0))
+
+
+;(define (sqrt x)
+;  (newtons-method 
+;   (lambda (y) 
+;     (- (square y) x)) 
+;   1.0))
 
 (define (fixed-point-of-transform g transform guess)
   (fixed-point (transform g) guess))
@@ -177,6 +207,11 @@
    1.0))
 
 (nth-root 6 64)
+
+
+    
+  
+  
 
 ;(display "thrice: ")(smooth-sq 2)
 ;
