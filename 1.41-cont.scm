@@ -76,4 +76,100 @@
 		((lambda(x2)( inc ( inc x2))) x2))) x2))) 
 	)  	
 5)
-				
+;works
+((lambda(x2)
+				((lambda(x2)((lambda(x2)((lambda(x2)( inc ( inc x2))) 
+					((lambda(x2)( inc ( inc x2))) x2))) ((lambda(x2)((lambda(x2)( inc ( inc x2))) 
+					((lambda(x2)( inc ( inc x2))) x2))) x2))) 
+			
+				((lambda(x2)((lambda(x2)((lambda(x2)( inc ( inc x2))) 
+					((lambda(x2)( inc ( inc x2))) x2))) ((lambda(x2)((lambda(x2)( inc ( inc x2))) 
+					((lambda(x2)( inc ( inc x2))) x2))) x2)))  x2)))		  
+5)
+;works
+((lambda(x2)((lambda(x2)((lambda(x2)( inc ( inc x2))) 
+					((lambda(x2)( inc ( inc x2))) x2))) ((lambda(x2)((lambda(x2)( inc ( inc x2))) 
+					((lambda(x2)( inc ( inc x2))) x2))) x2))) 
+			
+				((lambda(x2)((lambda(x2)((lambda(x2)( inc ( inc x2))) 
+					((lambda(x2)( inc ( inc x2))) x2))) ((lambda(x2)((lambda(x2)( inc ( inc x2))) 
+					((lambda(x2)( inc ( inc x2))) x2))) x2)))  5))	
+;works
+((lambda(x2)((lambda(x2)((lambda(x2)( inc ( inc x2))) 
+					((lambda(x2)( inc ( inc x2))) x2))) ((lambda(x2)((lambda(x2)( inc ( inc x2))) 
+					((lambda(x2)( inc ( inc x2))) x2))) x2))) 
+			
+				((lambda(x2)((lambda(x2)( inc ( inc x2))) 
+					((lambda(x2)( inc ( inc x2))) x2))) ((lambda(x2)((lambda(x2)( inc ( inc x2))) 
+					((lambda(x2)( inc ( inc x2))) x2))) 5)))		  
+;
+((lambda(x2)((lambda(x2)((lambda(x2)( inc ( inc x2))) 
+					((lambda(x2)( inc ( inc x2))) x2))) 
+					((lambda(x2)((lambda(x2)( inc ( inc x2))) 
+					((lambda(x2)( inc ( inc x2))) x2))) x2))) 
+			
+				((lambda(x2)((lambda(x2)( inc ( inc x2))) 
+					((lambda(x2)( inc ( inc x2))) x2))) 
+					((lambda(x2)( inc ( inc x2))) 
+					((lambda(x2)( inc ( inc x2))) 5))))		
+;
+((lambda(x2)((lambda(x2)((lambda(x2)( inc ( inc x2))) 
+					((lambda(x2)( inc ( inc x2))) x2))) 
+					((lambda(x2)((lambda(x2)( inc ( inc x2))) 
+					((lambda(x2)( inc ( inc x2))) x2))) x2))) 
+			
+				((lambda(x2)((lambda(x2)( inc ( inc x2))) 
+					((lambda(x2)( inc ( inc x2))) x2))) 
+					((lambda(x2)( inc ( inc x2))) 
+					( inc ( inc 5)))))
+;
+((lambda(x2)((lambda(x2)((lambda(x2)( inc ( inc x2))) 
+					((lambda(x2)( inc ( inc x2))) x2))) 
+					((lambda(x2)((lambda(x2)( inc ( inc x2))) 
+					((lambda(x2)( inc ( inc x2))) x2))) x2))) 
+			
+				((lambda(x2)((lambda(x2)( inc ( inc x2))) 
+					((lambda(x2)( inc ( inc x2))) x2))) 
+					((lambda(x2)( inc ( inc x2))) 
+					7)))
+;((lambda(x2)((lambda(x2)((lambda(x2)( inc ( inc x2)))
+((lambda(x2)((lambda(x2)((lambda(x2)( inc ( inc x2)))  
+					((lambda(x2)( inc ( inc x2))) x2))) 
+					((lambda(x2)((lambda(x2)( inc ( inc x2))) 
+					((lambda(x2)( inc ( inc x2))) x2))) x2))) 
+			
+				((lambda(x2)((lambda(x2)( inc ( inc x2))) 
+					((lambda(x2)( inc ( inc x2))) x2))) 
+					9))
+					;
+((lambda(x2)((lambda(x2)((lambda(x2)( inc ( inc x2)))  
+					((lambda(x2)( inc ( inc x2))) x2))) 
+					((lambda(x2)((lambda(x2)( inc ( inc x2))) 
+					((lambda(x2)( inc ( inc x2))) x2))) x2))) 
+			
+				((lambda(x2)( inc ( inc x2))) 
+					((lambda(x2)( inc ( inc x2))) 9)))						
+;
+((lambda(x2)((lambda(x2)((lambda(x2)( inc ( inc x2)))  
+					((lambda(x2)( inc ( inc x2))) x2))) 
+					((lambda(x2)((lambda(x2)( inc ( inc x2))) 
+					((lambda(x2)( inc ( inc x2))) x2))) x2))) 
+			
+				((lambda(x2)( inc ( inc x2))) 
+					( inc ( inc 9))))	
+;
+((lambda(x2)((lambda(x2)((lambda(x2)( inc ( inc x2)))  
+					((lambda(x2)( inc ( inc x2))) x2))) 
+					((lambda(x2)((lambda(x2)( inc ( inc x2))) 
+					((lambda(x2)( inc ( inc x2))) x2))) x2))) 
+			
+				13)	
+((lambda(x2)((lambda(x2)( inc ( inc x2)))  
+					((lambda(x2)( inc ( inc x2))) x2))) 
+					((lambda(x2)( inc ( inc x2))) 
+					((lambda(x2)( inc ( inc x2))) 13)))
+					;... skip steps
+((lambda(x2)((lambda(x2)( inc ( inc x2)))  
+					((lambda(x2)( inc ( inc x2))) x2))) 
+					17)
+;... can see it gets applied 4 more times					
