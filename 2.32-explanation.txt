@@ -1,0 +1,2 @@
+assuming not null, subsets defines rest as a subsets which calls subsets again (2 3) and again (3) and again until it is null
+when it is null returns an empty list. The empty result gets appended to the map of the first element of the previous call over the empty result, yielding (() 3). This result gets return and is appended to the mapping result of the previous first (2) over the previous result (() 3) yielding (() (3) (2) (2 3)). The same happens for the very first call which has (1) as the first element.

@@ -1,0 +1,22 @@
+#lang racket
+(define (dis text)
+  
+  (display text)
+  (newline))
+(define (scale-tree tree factor)
+  (map(λ (sub-tree)
+        (if (pair? sub-tree)
+            (scale-tree sub-tree factor)
+            (* sub-tree factor)))
+      tree))
+
+(define (square-list lat)
+  (define (iter lat result)
+    (cond ((null? lat) result)
+          (else (cons (*(car lat)(car lat))
+                      (cdr square-list))))))
+
+(scale-tree (list 1 
+                  (list 2 (list 3 4) 5) 
+                  (list 6 7))
+            10)
