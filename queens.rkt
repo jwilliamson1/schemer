@@ -45,26 +45,31 @@
   ;null = safe
   ;element = safe
   ;pair check safety
-  ;(dis (cons "called positions: " (cons positions null)))
+;  (dis (cons "called positions: " (cons positions null)))
   ;the car is the only thing we care about comparing to the rest of the list
   ;i believe no matter what this function will always receive a sequence of at least 2 elements
   (let((new-row (car positions)))
-    ;(dis new-row)
+;    (dis new-row)
     (define (safe-iter? preceding-positions a-prev-col)
       (if(null? preceding-positions)
          #t
          (let((preceding-row (car preceding-positions)))
-;           (dis (cons "new row" (cons new-row null)))
+           (dis (cons "new row" (cons new-row null)))
 ;           (dis (cons "new col" (cons current-col null)))
-;           (dis (cons "prededing row" (cons preceding-row null)))
-;           (dis (cons "prededing col" (cons a-prev-col null)))
+           (dis (cons "called positions: " (cons positions null)))
+           ;(dis (cons "prededing row" (cons preceding-row null)))
+           ;(dis (cons "prededing col" (cons a-prev-col null)))
            (cond
              ;((null? new-row)#t);if get to the end of sequence then we good
              ((null? preceding-row)#t)
              ;((null? (cdr preceding-positions))#t)
-             ((= new-row (car preceding-positions))#f)
-             ((or(= (abs(- new-row preceding-row))(- current-col a-prev-col))
-                 (= (+ new-row preceding-row)(+ current-col a-prev-col))) #f)
+             ((= new-row preceding-row)#f)
+             (
+              ;(or
+               (= (abs(- new-row preceding-row))(- current-col a-prev-col))
+               ;(= (+ new-row preceding-row)(+ current-col a-prev-col))
+               ;)
+              #f)
              (else (safe-iter? (cdr preceding-positions)(- a-prev-col 1)))))))
     (safe-iter? (cdr positions)(- current-col 1)))
   )
@@ -94,7 +99,7 @@
                     rest-of-queens))
                  (enumerate-interval ;creates stream of vertical rows
                   1 
-                6)))
+                board-size)))
           (queen-cols (- k 1))))))
   (queen-cols board-size))
 
