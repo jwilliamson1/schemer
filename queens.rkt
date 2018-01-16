@@ -25,41 +25,47 @@
                       (cdr sequence)))))
 
  (define empty-board
-   '())
+   '()
+   )
 
 (define (adjoin-position new-row k rest-of-queens)
   ;takes enumerated rows and creates a position
-  (cons rest-of-queens (cons(list new-row k)null))
+  (append (list new-row) rest-of-queens)
   )
 
 (adjoin-position 1 1 empty-board)
 
-(define (safe? current-col positions) ;ie 1 (1 1)(()()) or 2 (2 2)(1 1)(()())
-  ;receives streams of conditions like  (1 1) (() ())
-  ;determines if current position is horizotonal - first elements match
-  ;or diagnal -increased linear - to another position
-;  (if(null? (car positions))#t     
-;     (let ((attempted-row (car (car positions))))
-;       
-;       (define (iter  lower-poses)
-;         (let ((prev-row (car (car lower-poses)))
-;               (a-prev-col (car(cdr (car lower-poses)))))
-;           (cond ((null? prev-row)#t)
-;                 ((= attempted-row prev-row)#f)
-;                 ((or(= (- attempted-row prev-row)(- current-col a-prev-col))
-;                     (= (+ attempted-row prev-row)(+ current-col a-prev-col)))#f)
-;                 (else (iter(cdr lower-poses)))
-;                 )))
-;       (iter (cdr positions))))
-  #t
-  )
+(adjoin-position 3 2 (adjoin-position 1 1 empty-board))
 
+(define (safe? current-col positions) 
+  (dis (cons 'positions: (cons positions null)))
+
+     (let ((attempted-row (car positions)))
+       (dis (cons 'seq: (cons attempted-row '())))
+       (define (iter  lower-poses)
+         (if(null? lower-poses)
+            #t
+            (let ((prev-row (car (car lower-poses)))
+                  (a-prev-col (car(cdr (car lower-poses)))))
+              (cond ((null? prev-row)#t)
+                    ((= attempted-row prev-row)#f)
+                    ((or(= (- attempted-row prev-row)(- current-col a-prev-col))
+                        (= (+ attempted-row prev-row)(+ current-col a-prev-col)))#f)
+                    (else (iter(cdr lower-poses)))
+                    ))))
+       (iter (cdr positions))))
+ 
+  
+(define queens-seq '((1 7 2 6)(6 2 7 1)))
 (null?(car(car(cdr '((1 1)(() ()))))))
-(safe? 1 '((1 1)(()())))
-(safe? 2 '((2 2)(1 1)(()())))
-(safe? 2 '((3 2)(1 1)(()())))
-(safe? 2 '((1 2)(2 1)(()())))
+;(safe? 1 '((1 1)(()())))
+;(safe? 2 '((2 2)(1 1)(()())))
+;(safe? 2 '((3 2)(1 1)(()())))
+;(safe? 2 '((1 2)(2 1)(()())))
+;(safe?  4 queens-seq)
+
 (define (queens board-size)
+  ;returns a seq of all solutions
   (define (queen-cols k)
     (if (= k 0)
         (list empty-board)
@@ -75,18 +81,85 @@
                     rest-of-queens))
                  (enumerate-interval ;creates stream of vertical rows
                   1 
-                  board-size)))
+                  8)))
           (queen-cols (- k 1))))))
   (queen-cols board-size))
+(dis 'map-test)
+(flatmap
+ (lambda (rest-of-queens)
+   (map (lambda (new-row);creates stream of sets of queen positions
+          (adjoin-position 
+           new-row 
+           1
+           rest-of-queens))
+        (enumerate-interval ;creates stream of vertical rows
+         1 
+         8))
+   )
+ '((1 1)
+  (1 2)
+  (1 3)
+  (1 4)
+  (1 5)
+  (1 6)
+  (1 7)
+  (1 8)
+  (2 1)
+  (2 2)
+  (2 3)
+  (2 4)
+  (2 5)
+  (2 6)
+  (2 7)
+  (2 8)
+  (3 1)
+  (3 2)
+  (3 3)
+  (3 4)
+  (3 5)
+  (3 6)
+  (3 7)
+  (3 8)
+  (4 1)
+  (4 2)
+  (4 3)
+  (4 4)
+  (4 5)
+  (4 6)
+  (4 7)
+  (4 8)
+  (5 1)
+  (5 2)
+  (5 3)
+  (5 4)
+  (5 5)
+  (5 6)
+  (5 7)
+  (5 8)
+  (6 1)
+  (6 2)
+  (6 3)
+  (6 4)
+  (6 5)
+  (6 6)
+  (6 7)
+  (6 8)
+  (7 1)
+  (7 2)
+  (7 3)
+  (7 4)
+  (7 5)
+  (7 6)
+  (7 7)
+  (7 8)
+  (8 1)
+  (8 2)
+  (8 3)
+  (8 4)
+  (8 5)
+  (8 6)
+  (8 7)
+  (8 8)))
 
-
-
-(map (lambda (new-row)
-        (adjoin-position 
-         new-row 
-         1
-         empty-board))
-      (enumerate-interval 
-       1 
-       8))
-(queens 2)
+(dis "actual queens")
+;(queens 1)
