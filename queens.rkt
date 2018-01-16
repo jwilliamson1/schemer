@@ -3,6 +3,9 @@
   (display text)
   (newline))
 
+(define (disp label var)
+  (cons label (cons var null)))
+
 
 (define (enumerate-interval start end)
   (define(iter result start)
@@ -61,7 +64,7 @@
              ;((null? (cdr preceding-positions))#t)
              ((= new-row (car preceding-positions))#f)
              ((or(= (abs(- new-row preceding-row))(- current-col a-prev-col))
-                 (= (+ new-row preceding-row)(+ current-col a-prev-col)))#f)
+                 (= (+ new-row preceding-row)(+ current-col a-prev-col))) #f)
              (else (safe-iter? (cdr preceding-positions)(- a-prev-col 1)))))))
     (safe-iter? (cdr positions)(- current-col 1)))
   )
@@ -91,12 +94,12 @@
                     rest-of-queens))
                  (enumerate-interval ;creates stream of vertical rows
                   1 
-                8)))
+                6)))
           (queen-cols (- k 1))))))
   (queen-cols board-size))
 
 (dis "actual queens")
-(queens 8)
+(queens 6)
   
 ;(dis 'map-test)
 ;(flatmap
