@@ -3,8 +3,9 @@
   (display text)
   (newline))
 
-(define (disp label var)
-  (cons label (cons var null)))
+(define (disp label var)  
+  (display(cons label (cons var null)))
+  (newline))
 
 
 (define (enumerate-interval start end)
@@ -41,6 +42,7 @@
 (adjoin-position 3 2 (adjoin-position 1 1 empty-board))
 
 (define (safe? current-col positions);receives a sequence group of potential solutions and returns t or f to filter
+  (disp "incoming positions: " positions)
   ;null = safe
   ;element = safe
   ;pair check safety
@@ -68,6 +70,10 @@
 ;(safe? 2 '((1 2)(2 1)(()())))
 ;(safe?  4 queens-seq)
 
+(define (safe?-true current-col positions)
+  (disp "incoming positions: " positions)
+  #t)
+
 (define (queens board-size)
   ;returns a seq of all solutions
   (define (queen-cols k)
@@ -75,7 +81,7 @@
         (list empty-board)
         (filter;returns a set of safe positions
          (lambda (positions) 
-           (safe? k positions))
+           (safe?-true k positions))
          (flatmap ;returns stream of unchecked new positions appended to ok'ed positions
           (lambda (rest-of-queens)
             (map (lambda (new-row);creates stream of sets of queen positions
@@ -90,7 +96,40 @@
   (queen-cols board-size))
 
 (dis "actual queens")
-(length(queens 8))
+(length(queens 3))
+
+
+
+(define (queens-slow board-size)
+  ;returns a seq of all solutions
+  (define (queen-cols k)
+    (if (= k 0)
+        (list empty-board)
+        (filter;returns a set of safe positions
+         (lambda (positions) 
+           (safe?-true k positions))
+         (flatmap
+          (lambda (new-row)
+            (map (lambda (rest-of-queens)
+                   (adjoin-position 
+                    new-row
+                    k
+                    rest-of-queens))
+                 (queen-cols (- k 1))))
+          (enumerate-interval 1 board-size))
+         )))
+  (queen-cols board-size))
+
+(queens-slow 3)
+
+;k not 0 so goes to filter
+;filter executes flatmap which takes 1 - 8 as a sequence
+;1-8 gets applied to lambda as new row
+;for each one of these numbers 1-8 the lambda's
+;map is called which makes a recursive call to queen-cols k-1
+;so this is k * n times for however big k is
+;each one of these calls to queens-slow will generate n recursive calls to queens cols k-1
+
   
 ;(dis 'map-test)
 ;(flatmap
