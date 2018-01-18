@@ -96,7 +96,7 @@
   (queen-cols board-size))
 
 (dis "actual queens")
-(length(queens 3))
+(length(queens 4))
 
 
 
@@ -120,7 +120,7 @@
          )))
   (queen-cols board-size))
 
-(queens-slow 3)
+(queens-slow 4)
 
 ;k not 0 so goes to filter
 ;filter executes flatmap which takes 1 - 8 as a sequence
@@ -130,6 +130,24 @@
 ;so this is k * n times for however big k is
 ;each one of these calls to queens-slow will generate n recursive calls to queens cols k-1
 
+;for 2 call flat map twice
+;each flatmap calls lambda new row twice on queen cols - 1 = k is 1
+;each flatmap calls lambda new row twice on queen cols - 1 = k is 0 so this is 4 calls to k=0
+;return nulls to k-2 flatmap and map enumerate intervals to it ()()()()
+
+;for 3 call flatmap thrice
+;each flatmap calls lambda new row 3 times on queen cols 2 | 3 flatmaps waiting
+;each flatmap calls lambda new row 3 times on queen cols 1 | 3 flatmaps waiting and 9 total flatmaps
+;each flatmap calls lambda new row 3 times on queens col 0 | 3 flat maps waiting and 27 total flatmaps
+;each flatmap on a group of 9 3 times = 27
+;each flatmap on a group of 9 3 times = 27
+
+;for 4 calls flap map gets called 4 times
+;each flatmap calls lambda new row 4 times on queen cols 3 | 
+;each flatmap calls lambda new row 4 times on queen cols 2 | 16 total flatmaps
+;each flatmap calls lambda new row 4 times on queen cols 1 | 64 total flat maps
+;each flat map calls λ new row 4 times on queen cols 0 | 256 total flat maps
+; 4 * 256 = 1024
   
 ;(dis 'map-test)
 ;(flatmap
