@@ -1,5 +1,5 @@
-#lang sicp
-(#%require sicp-pict)
+#lang scheme
+(require (planet "sicp.ss" ("soegaard" "sicp.plt" 2 1)))
 
 ;(paint einstein)
 
@@ -32,8 +32,8 @@
 
 (define right-split (split beside below))
 (define up-split (split below beside))
-(paint (rght-split einstein 5))
-(paint (up-split einstein 5)) 
+;(paint (rght-split einstein 5))
+;(paint (up-split einstein 5)) 
       
 
 (define (corner-split painter n)
@@ -57,20 +57,21 @@
                         quarter)))
       (below (flip-vert half) half))))
 
-(paint(square-limit einstein 5))
+;(paint(square-limit einstein 5))
 
 (define (make-vect x y)
-  (cons x (cons y nil)))
+   (cons x y))
+
+(define (xcor-vect v)
+   (car v))
+
+(define (ycor-vect v)
+   (cdr v))
+
 
 (define a-vect(make-vect 3 2))
 
-(define (xcor-vect v)
-  (car v))
-
 (xcor-vect a-vect)
-
-(define (ycor-vect v)
-  (cadr v))
 
 (ycor-vect a-vect)
 
@@ -100,4 +101,72 @@
 (ycor-vect(sub-vect a-vect a-vect))
 
 (xcor-vect(scale-vect 10 a-vect))
-(ycor-vect(scale-vect 10 a-vect)) 
+(ycor-vect(scale-vect 10 a-vect))
+
+(define (make-frame origin edge1 edge2)
+  (list origin edge1 edge2))
+
+(define frame1 (make-frame (make-vect 0 0)(make-vect 0 1)(make-vect 1 0)))
+
+(define (origin-frame frame)
+  (car frame))
+
+(origin-frame frame1)
+
+(define (edge1-frame frame)
+  (cadr frame))
+
+(edge1-frame frame1)
+
+(define (edge2-frame frame)
+  (caddr frame))
+
+(edge2-frame frame1)
+
+(define (frame-coord-map frame)
+  (lambda (v)
+    (add-vect
+     (origin-frame frame)
+     (add-vect 
+      (scale-vect (xcor-vect v)
+                  (edge1-frame frame))
+      (scale-vect (ycor-vect v)
+                  (edge2-frame frame))))))
+
+;(define (segments->painter segment-list)
+;  (lambda (frame)
+;    (for-each
+;     (lambda (segment)
+;       (draw-line
+;        ((frame-coord-map frame) 
+;         (start-segment segment))
+;        ((frame-coord-map frame) 
+;         (end-segment segment))))
+;     segment-list)))
+
+ ;; heh 
+ (define make-segment cons) 
+ (define start-segment car) 
+ (define end-segment cdr)
+
+(define outline-segments (list (make-segment (make-vect .02 .02)
+                                             (make-vect .02 .98))
+                               (make-segment (make-vect .02 .98)
+                                             (make-vect .98 .98))
+                               (make-segment (make-vect .98 .02)
+                                             (make-vect .98 .98))
+                               (make-segment (make-vect .02 .02)
+                                             (make-vect .98 .02))))
+
+(define x-segments (list(make-segment (make-vect 0 0)
+                                      (make-vect 1 1))
+                        (make-segment (make-vect 0 1)
+                                      (make-vect 1 0))))
+
+
+(start-segment x-segments)
+(end-segment x-segments)
+
+
+(paint (segments->painter outline-segments))
+(paint (segments->painter x-segments))
