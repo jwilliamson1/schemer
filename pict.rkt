@@ -27,15 +27,13 @@
                                    (- n 1))))
           (op1 painter
                (op2 smaller smaller)))))
-  (lambda(ptr i)
-    (split-iter ptr i)
-    )
+  split-iter  
   )
 
 (define right-split (split beside below))
 (define up-split (split below beside))
-;(paint (rght-split einstein 5))
-;(paint (up-split einstein 5)) 
+(paint (rght-split einstein 5))
+(paint (up-split einstein 5)) 
       
 
 (define (corner-split painter n)
@@ -60,3 +58,46 @@
       (below (flip-vert half) half))))
 
 (paint(square-limit einstein 5))
+
+(define (make-vect x y)
+  (cons x (cons y nil)))
+
+(define a-vect(make-vect 3 2))
+
+(define (xcor-vect v)
+  (car v))
+
+(xcor-vect a-vect)
+
+(define (ycor-vect v)
+  (cadr v))
+
+(ycor-vect a-vect)
+
+(define(op-vect op)
+  (lambda(v1 v2)
+    (make-vect
+     (op (xcor-vect v1)(xcor-vect v2))
+     (op (ycor-vect v1)(ycor-vect v2)))))
+
+(define add-vect
+  (op-vect +))
+
+(define sub-vect
+  (op-vect -))
+
+(define (scale-vect s v)
+  (make-vect (* s(xcor-vect v))
+             (* s(ycor-vect v))))
+  
+
+(xcor-vect((op-vect +)a-vect a-vect))
+
+(xcor-vect(add-vect a-vect a-vect))
+(ycor-vect(add-vect a-vect a-vect))
+
+(xcor-vect(sub-vect a-vect a-vect))
+(ycor-vect(sub-vect a-vect a-vect))
+
+(xcor-vect(scale-vect 10 a-vect))
+(ycor-vect(scale-vect 10 a-vect)) 
