@@ -59,8 +59,8 @@
 
 ;(paint(square-limit einstein 5))
 
-(define (make-vect x y)
-   (cons x y))
+;(define (make-vect x y)
+;   (cons x y))
 
 (define (xcor-vect v)
    (car v))
@@ -103,8 +103,8 @@
 (xcor-vect(scale-vect 10 a-vect))
 (ycor-vect(scale-vect 10 a-vect))
 
-(define (make-frame origin edge1 edge2)
-  (list origin edge1 edge2))
+;(define (make-frame origin edge1 edge2)
+;  (list origin edge1 edge2))
 
 (define frame1 (make-frame (make-vect 0 0)(make-vect 0 1)(make-vect 1 0)))
 
@@ -145,18 +145,18 @@
 ;     segment-list)))
 
  ;; heh 
- (define make-segment cons) 
+; (define make-segment cons) 
  (define start-segment car) 
  (define end-segment cdr)
 
-(define outline-segments (list (make-segment (make-vect .02 .02)
-                                             (make-vect .02 .98))
-                               (make-segment (make-vect .02 .98)
-                                             (make-vect .98 .98))
-                               (make-segment (make-vect .98 .02)
-                                             (make-vect .98 .98))
-                               (make-segment (make-vect .02 .02)
-                                             (make-vect .98 .02))))
+(define outline-segments (list (make-segment (make-vect .01 .01)
+                                             (make-vect .01 .99))
+                               (make-segment (make-vect .01 .99)
+                                             (make-vect .99 .99))
+                               (make-segment (make-vect .99 .01)
+                                             (make-vect .99 .99))
+                               (make-segment (make-vect .01 .01)
+                                             (make-vect .99 .01))))
 
 (define x-segments (list(make-segment (make-vect 0 0)
                                       (make-vect 1 1))
@@ -170,3 +170,23 @@
 
 (paint (segments->painter outline-segments))
 (paint (segments->painter x-segments))
+
+(define (transform-painter 
+         painter origin corner1 corner2)
+  (lambda (frame)
+    (let ((m (frame-coord-map frame)))
+      (let ((new-origin (m origin)))
+        (painter (make-frame new-origin
+                  (sub-vect (m corner1) 
+                            new-origin)
+                  (sub-vect (m corner2)
+                            new-origin)))))))
+
+(define (flip-vert painter)
+  (transform-painter
+   painter
+   (make-vect 0.0 1.0)
+   (make-vect 1.0 1.0)
+   (make-vect 0.0 0.0)))
+
+(paint (flip-vert einstein))

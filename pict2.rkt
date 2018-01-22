@@ -128,9 +128,14 @@
                        (make-segment (make-vect .75 0) (make-vect .6 0)) 
                        (make-segment (make-vect .6 0) (make-vect .5 .3)) 
                        (make-segment (make-vect .5 .3) (make-vect .4 0)) 
-                       (make-segment (make-vect .4 0) (make-vect .25 0)) 
+                       (make-segment (make-vect .4 0) (make-vect .25 0))
+                       ;smile
+                       (make-segment (make-vect .48 .75)(make-vect .52 .75))
+                       (make-segment (make-vect .45 .78)(make-vect .48 .75))
+                       (make-segment (make-vect .55 .78)(make-vect .52 .75))
                        ))) 
  ;George! 
+;(wave unit-frame)
 
 (define (flip-vert painter)
   (transform-painter 
@@ -216,9 +221,57 @@
 (define (below-rot painter1 painter2)
   (rotate90 (beside (rotate270 painter2)(rotate270 painter1))))
 
-((below-rot wave wave)unit-frame)
-
+;((below-rot wave wave)unit-frame)
+(define (split op1 op2)
+  (define (split-iter painter n)
+    (if (= n 0)
+        painter
+        (let ((smaller (split-iter painter
+                                   (- n 1))))
+          (op1 painter
+               (op2 smaller smaller)))))
+  split-iter  
+  )
 ;((below wave wave)unit-frame)
-                                       
+(define right-split (split beside below))
+(define up-split (split below beside))
+
+(define (repeat-painter transform painter n)
+  (cond ((< n 1) painter)
+        ((= n 1)(transform painter painter))
+        (else(transform (repeat-painter transform painter (- n 1))
+                        (repeat-painter transform painter (- n 1))))))
+
+;((repeat-painter beside wave 2)unit-frame)
+
+(define (corner-split painter n m)
+  (if (= n 0)
+      painter
+      (let ((up (up-split painter (- n 1)))
+            (right (right-split painter 
+                                (- n 1))))
+        (let ((top-left (repeat-painter beside up m))
+              (bottom-right (repeat-painter below right m))
+              (corner (corner-split painter 
+                                    (- n 1)(- m 1))))
+          (beside (below painter top-left)
+                  (below bottom-right 
+                         corner))))))                                       
                                          
-    
+ ((corner-split wave 3 3) unit-frame)
+
+(define (square-of-four tl tr bl br)
+  (lambda (painter)
+    (let ((top (beside (tl painter) 
+                       (tr painter)))
+          (bottom (beside (bl painter) 
+                          (br painter))))
+      (below bottom top))))
+
+(define (square-limit painter n)
+  (let ((combine4 
+         (square-of-four flip-horiz 
+                         identity
+                         rotate180 
+                         flip-vert)))
+    (combine4 (corner-split painter n))))
