@@ -1,4 +1,4 @@
-
+#lang racket
 
 (cons 'a 'b)
 (cons 'a 2)
@@ -51,12 +51,20 @@
        (eq? v1 v2)))
 
 (define (make-exponentiation b e)
-  (cond((and (=number? b 0)(=number? e 0))1)
+  (cond((and (=number? b 0)(=number? e 0))error "Zero to the zeroth power is undefined.")
        ((=number? e 0) 1)
        ((=number? e 1) b)
-       ((and (number? a1) (number? a2)) 
-        (expt a1 a2))
+       ((and (number? b) (number? e)) 
+        (expt b e))
        (else (list '^ b e))))
+
+(displayln "make-exponentation test")
+(make-exponentiation 0 0); undefined
+(make-exponentiation 0 1); 0
+(make-exponentiation 1 0); 1
+(make-exponentiation 1 1); 1
+(make-exponentiation 2 1); 2
+(make-exponentiation 2 2); 4
 
 (define (make-sum a1 a2)
   (cond ((=number? a1 0) a2)
@@ -78,6 +86,9 @@
 (define (exponentiation? x)
   (and (pair? x) (eq? (car x) '^)))
 
+(displayln "exponentiation")
+(exponentiation? '(^ x 4))
+
 (define (base e) (cadr e))
 
 (define (exponent e) (caddr e))
@@ -87,14 +98,25 @@
 
 (define (addend s) (cadr s))
 
-(define (augend s) (caddr s))
+(null? (cdddr'(+ a b c)))
+
+(define (arb-args x)
+  (if(null? (cdddr x))
+     (caddr x)
+     (cons '+ (cddr x))))
+
+(define (augend s)(arb-args s))
+
+(displayln "augend")
+(augend '(+ a b))
+(augend '(+ a b c))
 
 (define (product? x)
   (and (pair? x) (eq? (car x) '*)))
 
 (define (multiplier p) (cadr p))
 
-(define (multiplicand p) (caddr p))
+(define (multiplicand p) (arb-args p))
 
 (define (deriv exp var)
   (cond ((number? exp) 0)
@@ -111,11 +133,22 @@
           (make-product 
            (deriv (multiplier exp) var)
            (multiplicand exp))))
+        ((exponentiation? exp)
+         (make-product
+          (make-product (exponent exp)
+                        (make-exponentiation
+                         (base exp)
+                         (- (exponent exp) 1)))
+          (deriv (base exp) var)))
         (else (error "unknown expression 
                       type: DERIV" exp))))
 
 (deriv '(+ x 3) 'x)
-
-(deriv '(* x y) 'x)
+(displayln "'(* x y) 'x)")
+(deriv '(* x 3 y) 'x)
 
 (deriv '(* (* x y) (+ x 3)) 'x)
+;a x 2 + b x + c
+(deriv '(+ (* a (^ x 2))(* b x) c) 'x)
+(deriv '(+ (* 6 (^ x 3))(* b x) c) 'x)
+(deriv '(+ (* 4(^ x 4))(* 3 (^ x 3))(* 2 (^ x 2))(* 1 (^ x 1)) ) 'x)
