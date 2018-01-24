@@ -86,20 +86,33 @@
        (else #f)))
 
 (define (make-sum a1 a2)
-  (cond ((=number? a1 0) a2)
+  (define (simplify-sums s1 s2)    
+    
+    (if(sum? s2)
+       (append s1 (cdr s2))
+       (append s1 (list s2))))
+  (cond ((=number? a1 0) a2); take care of zeros
         ((=number? a2 0) a1)
-        ((and (number? a1) (number? a2)) 
-         (+ a1 a2))
-        ((sum? a1)(displayln a1)
-         (if(and(number? (addend a1))(pure-pair? a2))
-                     (make-sum(make-sum a2 (addend a1)) (augend a1))
-                     (make-sum(make-sum a2 (augend a1)) (addend a1))))
-        ((sum? a2)(if(and(number? (addend a2))pure-pair? a1)
-                     (make-sum(make-sum a1 (addend a2)) (augend a2))
-                     (make-sum(make-sum a1 (augend a2)) (addend a2))))
+        ((and (number? a1) (number? a2))(+ a1 a2))
+         ;if just numbers just add em
+         ;at this point one of the arguments is not a simple number
+         ;could be a sum, product, or exponentiation like (6 (* 5 x)) or (+ (^ x 5) 7)
+        ;but it could be (+ x y) 3)
+        ((sum? a1)(simplify-sums a1 a2))
+        ((sum? a2)(append (list '+) (list a1) (cdr a2)))
+;        ((sum? a1)(displayln a1)
+;         (if(and(number? (addend a1))(pure-pair? a2))
+;                     (make-sum(make-sum a2 (addend a1)) (augend a1))
+;                     (make-sum(make-sum a2 (augend a1)) (addend a1))))
+;        ((sum? a2)(if(and(number? (addend a2))pure-pair? a1)
+;                     (make-sum(make-sum a1 (addend a2)) (augend a2))
+;                     (make-sum(make-sum a1 (augend a2)) (addend a2))))
         (else (list '+ a1 a2))))
 
 (displayln "make-sum test")
+(make-sum '(+ x 5 5)'(* 3 y))
+(make-sum '(+ x y y)'(* 3 y))
+(make-sum '(* 3 y)'(+ x y))
 (make-sum(make-sum  4 5)(make-sum 6 'x))
 (make-sum(make-sum  4 5)(make-sum 'x 6))
 (make-sum(make-sum 6 'x)(make-sum  4 5))
@@ -107,6 +120,7 @@
 (make-sum(make-sum 'x 6)(make-sum  4 'y))
 
 (define (make-product m1 m2)
+
   (cond ((or (=number? m1 0) 
              (=number? m2 0)) 
          0)
@@ -114,10 +128,14 @@
         ((=number? m2 1) m1)
         ((and (number? m1) (number? m2)) 
          (* m1 m2))
+        ;((product? m1))
         (else (list '* m1 m2))))
 
 (displayln "make-product test")
+(make-product(make-product  'x '4)(make-product 'x 7))
 (make-product(make-product  4 5)(make-product 6 7))
+
+
 
 (define (exponentiation? x)
   (and (pair? x) (eq? (car x) '^)))
@@ -170,12 +188,13 @@
         (else (error "unknown expression 
                       type: DERIV" exp))))
 
-;(deriv '(+ x 3) 'x)
-;(displayln "'(* x y) 'x)")
-;(deriv '(* x 3 y) 'x)
+(deriv '(+ x 3) 'x)
+(displayln "'(* x y) 'x)")
+(deriv '(* x 3 y) 'x)
 
-;(deriv '(* (+ x y) (+ x 3)) 'x)
-;a x 2 + b x + c
-;(deriv '(+ (* a (^ x 2))(* b x) c) 'x)
-;(deriv '(+ (* 6 (^ x 3))(* b x) c) 'x)
-;(deriv '(+ (* 4(^ x 4))(* 3 (^ x 3))(* 2 (^ x 2))(* 1 (^ x 1)) ) 'x)
+(deriv '(* (+ x y) (+ x 3)) 'x)
+(deriv '(* x y (+ x 3)) 'x)
+;a x 2 + b x + c -> 2 a x + b 
+(deriv '(+ (* a (^ x 2))(* b x) c) 'x)
+(deriv '(+ (* 6 (^ x 3))(* b x) c) 'x)
+(deriv '(+ (* 4(^ x 4))(* 3 (^ x 3))(* 2 (^ x 2))(* 1 (^ x 1)) ) 'x)
