@@ -17,83 +17,157 @@
      (caddr x)
      (cons '+ (cons(cddr x)null))))
 
-(arb-args'(+ x x x))
+;(arb-args'(+ x x x))
 
 (define (arb-args-infix x)
   (if(null? (cdddr x)); only three arguments a + a
      (caddr x)
 ;else has more than that
      (cddr x)))
-(displayln "arb-args-infix")
-(arb-args-infix '(x + y + z))
+;(displayln "arb-args-infix")
+;(arb-args-infix '(x + y + z))
 
 ;PREDICATES
 (define (sum? x)
-  (and (pair? x) (eq? (cadr x) '+)))
-(displayln "sum?")
-(sum? '(3 + x))
+  (and (pair? x)(not(null? (cdr x))) (eq? (cadr x) '+)))
+;(displayln "sum?")
+;(sum? '(3 + x))
 
 (define (exponentiation? x)
   (and (pair? x) (eq? (cadr x) '^)))
 
 (define (product? x)
   (and (pair? x) (eq? (cadr x) '*)))
-(displayln "product?")
-(product? '(3 * 4))
+;(displayln "product?")
+;(product? '(3 * 4))
 
 (define (addend s) (car s))
 
-(null? (cdddr'(+ a b c)))
+;(null? (cdddr'(+ a b c)))
 
 (define (augend s)(arb-args-infix s))
-(displayln "augend")
-(augend '(a + b + c))
-(augend '(a + b + c + d))
+;(displayln "augend")
+;(augend '(a + b + c))
+;(augend '(a + b + c + d))
 
 ;check sum in
 ;we can add numbers directly or convert symbols into (* x 2)
 (define (number-or-eq-symbol? exp1 exp2)
   (or(and (number? exp1)(number? exp2))
      (and (variable? exp1)(eq? exp1 exp2))))
-(displayln "number-or-eq-symbol?")
-(number-or-eq-symbol? 'x 'x)
-(number-or-eq-symbol? 'x 'y)
-(number-or-eq-symbol? 'x  1)
-(number-or-eq-symbol? '2  1)
+;(displayln "number-or-eq-symbol?")
+;(number-or-eq-symbol? 'x 'x)
+;(number-or-eq-symbol? 'x 'y)
+;(number-or-eq-symbol? 'x  1)
+;(number-or-eq-symbol? '2  1)
 
 (define (if-list e)
   (if(pair? e) e (list e)))
 
-(define (make-sum a1 a2)
-  (define (handle-vars v1 v2)
-    (if(eq? v1 v2)
-       (list 2 '* v1)
-       (make-sum v1 v2)))
-  (define (make-flat-sum num sum)
-     (list num '+  sum))
-  (define (simplify-num-sum n s)
-    (cond((number? (addend s))(make-flat-sum(make-sum n (addend s))(list (augend s))))
-         (else (make-flat-sum(make-sum n (augend s))(list (addend s))))))
-  (define (simplify-sums s1 s2)    
-    (cond((number-or-eq-symbol? (addend s1)(addend s2))(make-flat-sum(handle-vars (addend s1)(addend s2))(handle-vars (augend s1)(augend s2))))
-         ((number-or-eq-symbol?(augend s1)(addend s2))(make-flat-sum(handle-vars (augend s1)(addend s2))(handle-vars (addend s1)(augend s2))))
-         ((number-or-eq-symbol?(addend s1)(augend s2))(make-flat-sum(handle-vars (addend s1)(augend s2))(handle-vars (augend s1)(addend s2))))
-         ((number-or-eq-symbol? (augend s1)(augend s2))(make-flat-sum(handle-vars (addend s1)(augend s2))(handle-vars  (augend s1)(addend s2))))
-         (else(append a1 (list '+) a2))))
-  (cond ((=number? a1 0) a2); take care of zeros
-        ((=number? a2 0) a1)
-        ((and (number? a1) (number? a2))(+ a1 a2))
-        ((or(product? a1)(exponentiation? a1))(cons a1 (cons '+ (cons a2 '()))))
-        ((or(product? a2)(exponentiation? a2))(cons a1 (cons '+ (cons a2 '()))))
-        ((or(product? a1)(exponentiation? a1))(append (if-list a1) (list '+) (if-list a2)))
-        ((or(product? a2)(exponentiation? a2))(append (if-list a1) (list '+) (if-list a2)))
-        ((and (sum? a1)(sum? a2))(simplify-sums a1 a2))
-        ((and (sum? a1)(number? a2))(simplify-num-sum a2 a1))
-        ((and (sum? a2)(number? a1))(simplify-num-sum a1 a2))     
-        (else (append(if-list a1) (list '+)(if-list a2)))))
+;(define (make-sum a1 a2)
+;  (displayln (list "make-sum: " a1 a2))
+;
+;  (define (handle-vars v1 v2)
+;    (displayln "handle-vars")
+;    (if(and(variable? v1)(eq? v1 v2))
+;       (list 2 '* v1)
+;       (make-sum v1 v2)))
+;
+;  (define (flatten-one-side flat unknown)
+;    (displayln (list "flatten-one-side" flat unknown))
+;    (if(sum? unknown)
+;       (append (list flat '+) unknown)
+;       (list flat '+ unknown)))
+;  
+;  (define (simplify-num/symbol-sum n s)
+;    (displayln (list "simplify-num-sum" n s))
+;    (cond((number-or-eq-symbol?  n(addend s))(flatten-one-side(augend s)(make-sum n (addend s))))
+;         (else (flatten-one-side(make-sum n (augend s))(addend s)))))
+;  
+;  (define (simplify-sums s1 s2)
+;    (displayln "simplify-sums")
+;    (cond((number-or-eq-symbol? (addend s1)(addend s2))(flatten-one-side(handle-vars (addend s1)(addend s2))(handle-vars (augend s1)(augend s2)))); first arg to flatten will either be a number or (x ^ 2)
+;         ((number-or-eq-symbol?(augend s1)(addend s2))(flatten-one-side(handle-vars (augend s1)(addend s2))(handle-vars (addend s1)(augend s2))))
+;         ((number-or-eq-symbol?(addend s1)(augend s2))(flatten-one-side(handle-vars (addend s1)(augend s2))(handle-vars (augend s1)(addend s2))))
+;         ((number-or-eq-symbol? (augend s1)(augend s2))(flatten-one-side(handle-vars (addend s1)(augend s2))(handle-vars  (augend s1)(addend s2))))
+;         (else(append a1 (list '+) a2))))
+;  
+;  (cond ((=number? a1 0) a2); take care of zeros
+;        ((=number? a2 0) a1)
+;        ((and (number? a1) (number? a2))(+ a1 a2)); if simple nums just add
+;        ((or(product? a1)(exponentiation? a1))(displayln "a1 is prod or exp")(flatten-one-side a1 a2))
+;        ((or(product? a2)(exponentiation? a2))(displayln "a2 is prod or exp")(flatten-one-side a2 a1))
+;        ((and (sum? a1)(sum? a2))(displayln "two sums")(simplify-sums a1 a2))
+;        ((and (sum? a1)(or(variable? a2)(number? a2)))(displayln "sum and num")(simplify-num/symbol-sum a2 a1))
+;        ((and (sum? a2)(or(variable? a1)(number? a1)))(displayln "sum and num")(simplify-num/symbol-sum a1 a2))     
+;        (else (displayln "else")(list a1 '+ a2))))
+
+(define (make-operation oper oper? higher-oper)
+  (lambda (a1 a2)
+    (define (make-oper a1 a2)
+      ;(displayln (list "make-oper: " a1 a2))
+      
+      (define (handle-vars v1 v2)
+       ; (displayln "handle-vars")
+        (if(and(variable? v1)(eq? v1 v2))
+           (list 2 higher-oper v1)
+           (make-oper v1 v2)))
+      
+      (define (flatten-one-side flat unknown)
+        ;(displayln (list "flatten-one-side" flat unknown))
+        (if(oper? unknown)
+           (append (list flat oper) unknown)
+           (list flat oper unknown)))
+
+      (define (flatten-right-side left right)
+        (displayln "flatten right side")
+        (if(oper? right)
+           (append right (list oper left ))
+           (list right oper left)))
+      
+      (define (simplify-num/symbol-oper n s)
+        ;(displayln (list "simplify-num-oper" n s))
+        (cond((number-or-eq-symbol?  n(addend s))(flatten-one-side(augend s)(make-oper n (addend s))))
+             (else (flatten-one-side(make-oper n (augend s))(addend s)))))
+      
+      (define (simplify-opers s1 s2)
+        ;(displayln "simplify-opers")
+        (cond((number-or-eq-symbol? (addend s1)(addend s2))(flatten-one-side(handle-vars (addend s1)(addend s2))(handle-vars (augend s1)(augend s2)))); first arg to flatten will either be a number or (x ^ 2)
+             ((number-or-eq-symbol?(augend s1)(addend s2))(flatten-one-side(handle-vars (augend s1)(addend s2))(handle-vars (addend s1)(augend s2))))
+             ((number-or-eq-symbol?(addend s1)(augend s2))(flatten-one-side(handle-vars (addend s1)(augend s2))(handle-vars (augend s1)(addend s2))))
+             ((number-or-eq-symbol? (augend s1)(augend s2))(flatten-one-side(handle-vars (addend s1)(augend s2))(handle-vars  (augend s1)(addend s2))))
+             (else(append a1 (list oper) a2))))
+      
+      (cond ((=number? a1 0) a2); take care of zeros
+            ((=number? a2 0) a1)
+            ((and (number? a1) (number? a2))(+ a1 a2)); if simple nums just add
+            ((or(product? a1)(exponentiation? a1))
+             ;(displayln "a1 is prod or exp")
+             (flatten-one-side a1 a2))
+            ((or(product? a2)(exponentiation? a2))
+             ;(displayln "a2 is prod or exp")
+             (flatten-right-side a2 a1))
+            ((and (oper? a1)(oper? a2))
+             ;(displayln "two sums")
+             (simplify-opers a1 a2))
+            ((and (oper? a1)(or(variable? a2)(number? a2)))
+            ; (displayln "sum and num")
+             (simplify-num/symbol-oper a2 a1))
+            ((and (oper? a2)(or(variable? a1)(number? a1)))
+             ;(displayln "sum and num")
+             (simplify-num/symbol-oper a1 a2))     
+            (else
+             ;(displayln "else")
+             (list a1 oper a2))))
+    (make-oper a1 a2)))
+(displayln "MAKE OPERATION TEST")
+((make-operation '+ sum? '*) 5 6)
+
+(define make-sum
+  (make-operation '+ sum? '*))
 
 (displayln "make-sum test")
-(make-sum '(5 + x )'(x + 3))
+(make-sum '(5 + x )'(x + 5))
 (make-sum '(5 + x)'(2 + y))
 (make-sum '(5 + x)'(2 + x))
 (make-sum 'y '(y + 7))
@@ -114,8 +188,6 @@
 (make-sum(make-sum 'x 6)(make-sum  4 5))
 (make-sum(make-sum 'x 6)(make-sum  4 'y))
 
-
-
 ;PRODUCT
 
 (define (make-product m1 m2)
@@ -133,10 +205,10 @@
          (else (make-flat-sum(make-product n (augend s))(list (addend s))))))
   
   (define (simplify-sums s1 s2)    
-    (cond((number-or-eq-symbol? (addend s1)(addend s2))(make-flat-sum(handle-vars (addend s1)(addend s2))(handle-vars (augend s1)(augend s2))))
+    (cond((number-or-eq-symbol?(addend s1)(addend s2))(make-flat-sum(handle-vars (addend s1)(addend s2))(handle-vars (augend s1)(augend s2))))
          ((number-or-eq-symbol?(augend s1)(addend s2))(make-flat-sum(handle-vars (augend s1)(addend s2))(handle-vars (addend s1)(augend s2))))
          ((number-or-eq-symbol?(addend s1)(augend s2))(make-flat-sum(handle-vars (addend s1)(augend s2))(handle-vars (augend s1)(addend s2))))
-         ((number-or-eq-symbol? (augend s1)(augend s2))(make-flat-sum(handle-vars (addend s1)(augend s2))(handle-vars  (augend s1)(addend s2))))
+         ((number-or-eq-symbol?(augend s1)(augend s2))(make-flat-sum(handle-vars (addend s1)(augend s2))(handle-vars (augend s1)(addend s2))))
          (else(append m1 (list '+) m2))))
 
   (cond ((or (=number? m1 0) 
@@ -172,7 +244,7 @@
 (define (multiplier p) (car p))
 
 (define (multiplicand p) (arb-args-infix p))
-(multiplicand '(3 * x))
+;(multiplicand '(3 * x))
 
 ;EXPONENTIATION
 (define (make-exponentiation b e)
