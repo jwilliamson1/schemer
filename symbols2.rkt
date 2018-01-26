@@ -51,31 +51,55 @@
 (augend '(a + b + c + d))
 
 ;check sum in
+;we can add numbers directly or convert symbols into (* x 2)
+(define (number-or-eq-symbol? exp1 exp2)
+  (or(and (number? exp1)(number? exp2))
+     (and (variable? exp1)(eq? exp1 exp2))))
+(displayln "number-or-eq-symbol?")
+(number-or-eq-symbol? 'x 'x)
+(number-or-eq-symbol? 'x 'y)
+(number-or-eq-symbol? 'x  1)
+(number-or-eq-symbol? '2  1)
 
+(define (if-list e)
+  (if(pair? e) e (list e)))
 
 (define (make-sum a1 a2)
+  (define (handle-vars v1 v2)
+    (if(eq? v1 v2)
+       (list 2 '* v1)
+       (make-sum v1 v2)))
+  (define (make-flat-sum num sum)
+    (append (list num '+) (if-list sum)))
+  (define (simplify-num-sum n s)
+    (cond((number? (addend s))(make-flat-sum(make-sum n (addend s))(list (augend s))))
+         (else (make-flat-sum(make-sum n (augend s))(list (addend s))))))
   (define (simplify-sums s1 s2)    
-    
-    (if(sum? s2)
-       (append s1 (cdr s2))
-       (append s1 (list s2))))
+    (cond((number-or-eq-symbol? (addend s1)(addend s2))(make-flat-sum(handle-vars (addend s1)(addend s2))(handle-vars (augend s1)(augend s2))))
+         ((number-or-eq-symbol?(augend s1)(addend s2))(make-flat-sum(handle-vars (augend s1)(addend s2))(handle-vars (addend s1)(augend s2))))
+         ((number-or-eq-symbol?(addend s1)(augend s2))(make-flat-sum(handle-vars (addend s1)(augend s2))(handle-vars (augend s1)(addend s2))))
+         ((number-or-eq-symbol? (augend s1)(augend s2))(make-flat-sum(handle-vars (addend s1)(augend s2))(handle-vars  (augend s1)(addend s2))))
+         (else(append a1 (list '+) a2))))
   (cond ((=number? a1 0) a2); take care of zeros
         ((=number? a2 0) a1)
         ((and (number? a1) (number? a2))(+ a1 a2))
-        ((and (or(product? a1)(exponentiation? a1))(or(product? a2)(exponentiation? a2)))(append a1 (list '+) a2))
-        ((or(product? a1)(exponentiation? a1))(append (list a1) (list '+)  a2))
-        ((or(product? a2)(exponentiation? a2))(append a1 (list '+) (list a2)))
-        ((and (sum? a1)(sum? a2))(append a1 (list '+) a2))
-         ;if just numbers just add em
-         ;at this point one of the arguments is not a simple number
-         ;could be a sum, product, or exponentiation like (6 (* 5 x)) or (+ (^ x 5) 7)
-        ;but it could be (+ x y) 3)
-        ;((sum? a1)(simplify-sums a1 a2))
-        ;((sum? a2)(append (list '+) (list a1) (cdr a2)))
-        
-        (else (list a1 '+ a2))))
+        ((and (or(product? a1)(exponentiation? a1))(or(product? a2)(exponentiation? a2)))(append a1 (list '+)  a2))
+        ((or(product? a1)(exponentiation? a1))(append (if-list a1) (list '+) (if-list a2)))
+        ((or(product? a2)(exponentiation? a2))(append (if-list a1) (list '+) (if-list a2)))
+        ((and (sum? a1)(sum? a2))(simplify-sums a1 a2))
+        ((and (sum? a1)(number? a2))(simplify-num-sum a2 a1))
+        ((and (sum? a2)(number? a1))(simplify-num-sum a1 a2))     
+        (else (append(if-list a1) (list '+)(if-list a2)))))
 
 (displayln "make-sum test")
+(make-sum '(5 + x )'(x + 3))
+(make-sum '(5 + x)'(2 + y))
+(make-sum '(5 + x)'(2 + x))
+(make-sum 'y '(y + 7))
+(make-sum 7 '(x + 7))
+(make-sum '(3 + x)'(6 + y))
+(make-sum '(x + 5)'(6 + y))
+(make-sum'(5 + y)'(7 ^ z))
 (make-sum '(x + 6)(make-sum'(5 + y)'(7 ^ z))) ; should become x + 11 + y
 (make-sum '(x + 6)'(5 ^ y)) ; should become x + 11 + y
 (make-sum '(x + 6)'(5 * y)) ; should become (x + 6 + (5 * y))
@@ -96,6 +120,25 @@
 ;PRODUCT
 
 (define (make-product m1 m2)
+  
+  (define (handle-vars v1 v2)
+    (if(eq? v1 v2)
+       (list v1 '^ 2)
+       (make-product v1 v2)))
+  
+  (define (make-flat-sum num sum)
+    (append (list num '*) (if-list sum)))
+  
+  (define (simplify-num-sum n s)
+    (cond((number? (addend s))(make-flat-sum(make-product n (addend s))(list (augend s))))
+         (else (make-flat-sum(make-product n (augend s))(list (addend s))))))
+  
+  (define (simplify-sums s1 s2)    
+    (cond((number-or-eq-symbol? (addend s1)(addend s2))(make-flat-sum(handle-vars (addend s1)(addend s2))(handle-vars (augend s1)(augend s2))))
+         ((number-or-eq-symbol?(augend s1)(addend s2))(make-flat-sum(handle-vars (augend s1)(addend s2))(handle-vars (addend s1)(augend s2))))
+         ((number-or-eq-symbol?(addend s1)(augend s2))(make-flat-sum(handle-vars (addend s1)(augend s2))(handle-vars (augend s1)(addend s2))))
+         ((number-or-eq-symbol? (augend s1)(augend s2))(make-flat-sum(handle-vars (addend s1)(augend s2))(handle-vars  (augend s1)(addend s2))))
+         (else(append m1 (list '+) m2))))
 
   (cond ((or (=number? m1 0) 
              (=number? m2 0)) 
@@ -104,15 +147,25 @@
         ((=number? m2 1) m1)
         ((and (number? m1) (number? m2)) 
          (* m1 m2))
+        ((and (number? m1) (number? m2))(+ m1 m2))
+        ((and (or(sum? m1)(exponentiation? m1))(or(sum? m2)(exponentiation? m2)))(append m1 (list '+)  m2))
         ;((product? m1))
-        (else (list m1 '* m2))))
+        ((and (product? m1)(product? m2))(simplify-sums m1 m2))
+        ((and (product?  m1)(number? m2))(simplify-num-sum m2 m1))
+        ((and (product?  m2)(number? m1))(simplify-num-sum m1 m2))   
+        (else (append(if-list m1) (list '*)(if-list m2)))))
 
 
 (displayln "make-product test")
 (make-product(make-product  'x '4)(make-product 'x 7))
+(make-product(make-product  'x '4)(make-product 'x 'y))
+(make-product(make-product  'x 'y)(make-product 'x 5))
+(make-product(make-product  'x 'y)(make-product 'x 'y))
+(make-product(make-product  4 5)(make-product 6 'x))
 (make-product(make-product  4 5)(make-product 6 7))
-
-
+(make-product 'x (make-product 6 8))
+(make-product '10 (make-product 6 8))
+(make-product(make-product  'x 'y)(make-sum 'x 5))
 
 (define (multiplier p) (car p))
 
@@ -126,12 +179,12 @@
        ((=number? e 1) b)
        ((and (number? b) (number? e)) 
         (expt b e))
-       (else (list '^ b e))))
+       (else (list b '^ e))))
 
 
 
-(displayln "exponentiation")
-(exponentiation? '(^ x 4))
+;(displayln "exponentiation")
+;(exponentiation? '(^ x 4))
 
 (define (base e) (car e))
 
@@ -164,11 +217,11 @@
         (else (error "unknown expression 
                       type: DERIV" exp))))
 
-(deriv '(x +  3) 'x)
-(displayln "'(* x y) 'x)")
-(deriv '(x * 3 * y) 'x)
-;
-(deriv '((x + y) * (x + 3)) 'x)
+(deriv '(x +  3) 'x) ;1
+(deriv '(x * y) 'x) ; y
+(deriv '(x * 3 * y) 'x); 3 * y
+(deriv '(x + (3 * (x + (y + 2)))) 'x)
+(deriv '((y * x) * (x + 3)) 'x) ;((x * y) + (y * (x + 3))) OR y(x+3)+yx OR y(2x+3)
 ;;a x 2 + b x + c -> 2 a x + b 
 (deriv '((a * (x ^ 2))+(b * x) + c) 'x)
 (deriv '((4 * (x ^ 4))+(3 * (x ^ 3))+(2 * (x ^ 2))+(1 * (x ^ 1)) ) 'x)
