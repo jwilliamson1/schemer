@@ -70,7 +70,7 @@
        (list 2 '* v1)
        (make-sum v1 v2)))
   (define (make-flat-sum num sum)
-    (append (list num '+) (if-list sum)))
+     (list num '+  sum))
   (define (simplify-num-sum n s)
     (cond((number? (addend s))(make-flat-sum(make-sum n (addend s))(list (augend s))))
          (else (make-flat-sum(make-sum n (augend s))(list (addend s))))))
@@ -83,7 +83,8 @@
   (cond ((=number? a1 0) a2); take care of zeros
         ((=number? a2 0) a1)
         ((and (number? a1) (number? a2))(+ a1 a2))
-        ((and (or(product? a1)(exponentiation? a1))(or(product? a2)(exponentiation? a2)))(append a1 (list '+)  a2))
+        ((or(product? a1)(exponentiation? a1))(cons a1 (cons '+ (cons a2 '()))))
+        ((or(product? a2)(exponentiation? a2))(cons a1 (cons '+ (cons a2 '()))))
         ((or(product? a1)(exponentiation? a1))(append (if-list a1) (list '+) (if-list a2)))
         ((or(product? a2)(exponentiation? a2))(append (if-list a1) (list '+) (if-list a2)))
         ((and (sum? a1)(sum? a2))(simplify-sums a1 a2))
@@ -105,10 +106,8 @@
 (make-sum '(x + 6)'(5 * y)) ; should become (x + 6 + (5 * y))
 (make-sum '(5 * y)'(x + 6)) ; should become (x + 6 + (5 * y))
 (make-sum '(5 * y)'(x ^ 6)) ; should become ((5 * y)+(x ^ 6))
-;(make-sum '(+ x y) (make-sum'(+ x y)'(+ x y)))
-;(make-sum '(+ x 5 5)'(* 3 y))
-;(make-sum '(+ x y y)'(* 3 y))
-;(make-sum '(* 3 y)'(+ x y))
+(make-sum '(x + y) (make-sum'(x + y)'(x + y)))
+(make-sum '(3 * y)'(x + y))
 (make-sum(make-sum  4 5)(make-sum 6 'x))
 (make-sum(make-sum  4 5)(make-sum 'x 6))
 (make-sum(make-sum 6 'x)(make-sum  4 5))
@@ -148,13 +147,16 @@
         ((and (number? m1) (number? m2)) 
          (* m1 m2))
         ((and (number? m1) (number? m2))(+ m1 m2))
-        ((and (or(sum? m1)(exponentiation? m1))(or(sum? m2)(exponentiation? m2)))(append m1 (list '+)  m2))
+        ((or(sum? m1)(exponentiation? m1))(cons m1 (cons '* (cons m2 '()))))
+        ((or(sum? m2)(exponentiation? m2))(cons m1 (cons '* (cons m2 '()))))
         ;((product? m1))
         ((and (product? m1)(product? m2))(simplify-sums m1 m2))
         ((and (product?  m1)(number? m2))(simplify-num-sum m2 m1))
         ((and (product?  m2)(number? m1))(simplify-num-sum m1 m2))   
         (else (append(if-list m1) (list '*)(if-list m2)))))
 
+(displayln "book infix example");(x + 3 * (x + y + 2))
+(make-sum 'x (make-product '3 (make-sum 'x (make-sum 'y 2))))
 
 (displayln "make-product test")
 (make-product(make-product  'x '4)(make-product 'x 7))
@@ -216,6 +218,8 @@
           (deriv (base exp) var)))
         (else (error "unknown expression 
                       type: DERIV" exp))))
+
+
 
 (deriv '(x +  3) 'x) ;1
 (deriv '(x * y) 'x) ; y
