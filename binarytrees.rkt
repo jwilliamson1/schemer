@@ -18,6 +18,7 @@
 
 (define (tree->list-2 tree)
   (define (copy-to-list tree result-list)
+    (displayln tree)
     (if (null? tree)
         result-list
         (copy-to-list 
@@ -43,3 +44,5 @@ deep-right-tree
 (tree->list-1 right-weight-tree)
 (tree->list-1 left-weight-tree)
 ;O(2^n)
+
+(tree->list-2(make-tree 7 (make-tree 3 (make-tree 1 '()'())(make-tree 5 '()'()))'()))
