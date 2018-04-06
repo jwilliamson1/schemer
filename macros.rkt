@@ -102,3 +102,32 @@ val3
 (let ([x 1] [y 2])
   (f x y)
   (list x y))
+
+(define-syntax while
+  (syntax-rules ()
+    ((while condition body ...)(let loop ()
+       (if condition
+           (begin
+             body ...
+             (loop))
+           #f)))))
+
+(define x 0)
+
+(while (< x 5)
+       (set! x (+ x 1))
+       (print x))
+
+(define-syntax for
+  (syntax-rules (in as)
+    ((for element in list body ...)
+     (map (lambda (element)
+            body ...)
+          list))
+    ((for element as list body ...)
+     (map (lambda (element)
+            body ...)
+          list))))
+
+(for i in '(0 1 2 3 4) (print i))
+(for i as '(0 1 2 3 4) (print i))
