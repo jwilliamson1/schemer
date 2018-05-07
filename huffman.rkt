@@ -202,30 +202,12 @@ sample-tree-3
 (define leaf-set (make-leaf-set '((A 8)(B 3)(C 1)(D 1)(E 1)(F 1)(G 1)(H 1))))
 (define leaf-set2 (make-leaf-set '((A 10)(B 9)(C 8)(D 7))))
 (define leaf-set3 (make-leaf-set '((A 12)(C 10)(E 8)(G 6))))
+(define leaf-set4 (make-leaf-set '((A 16)(B 8)(C 4)(D 2)(E 1))))
 
 (make-code-tree (car leaf-set)(cadr leaf-set))
 (make-code-tree (caddr leaf-set)(cadddr leaf-set))
 
-;(define (generate-huffman-tree pairs)
- ; (successive-merge 
-  ; (make-leaf-set pairs)))
-
 leaf-set
-
-(define (merge-tree pairs)
-  (cond
-    ((null? (cddr pairs))
-     (cons (car pairs)(cdr pairs)))       
-    (else (let ((left-pair-weight (+ (weight (car pairs))
-                                     (weight (cadr pairs))))
-                (right-pair-weight (+ (weight (cadr pairs))
-                                      (weight (caddr pairs)))))
-            
-            (if (> right-pair-weight left-pair-weight)
-                (let ((code-tree (make-code-tree (car pairs)(cadr pairs))))
-                  (merge-node code-tree (cdr pairs)))
-                (cons (car pairs)(merge-tree (cdr pairs))))))))
-
   
 (define (next-is-higher node1-weight node2-weight)
   (> node2-weight node1-weight))
@@ -233,24 +215,32 @@ leaf-set
 (define (weight-node node)
   (weight node))
 
-(define (merge-node node ordered-set)
-  (let ((first (car ordered-set)))
-    (cond ((null? (cdr ordered-set))
-           (if (< (weight node)(weight first))
-               (cons node (cons first '()))
-               (cons first (cons node '()))))
-          (else           
-           (if (or(and (< (weight node)(weight first)))
-                  (and (= (weight node)(weight first))))
-               (cons node (cons first (cdr ordered-set)))
-               (cons first (merge-node node (cdr ordered-set))))))))
-
 (define (successive-merge leaf-set)
   (cond
-    ((null? (cddr leaf-set)) (make-code-tree (car leaf-set)(cadr leaf-set)))
-        (else (successive-merge (merge-node(make-code-tree (car leaf-set)(cadr leaf-set))(cddr leaf-set))))))
+    ((null? (cdr leaf-set)) (car leaf-set))
+    (else (successive-merge (adjoin-set(make-code-tree (car leaf-set)(cadr leaf-set))(cddr leaf-set))))))
 
-(merge-node (make-leaf 'Z 13) leaf-set3)
-;(merge-node(merge-node(make-code-tree (car leaf-set)(cadr leaf-set))(cddr leaf-set)))
-;(merge-tree(merge-tree leaf-set2))
 (successive-merge leaf-set)
+
+(define (generate-huffman-tree pairs)
+  (successive-merge 
+   (make-leaf-set pairs)))
+
+(define pair-set '((A 8)(B 3)(C 1)(D 1)(E 1)(F 1)(G 1)(H 1)))
+(define one-leaf '((A 8)))
+(define two-in-pair '((A 8)(B 3)))
+
+(generate-huffman-tree pair-set)
+(generate-huffman-tree one-leaf)
+(generate-huffman-tree two-in-pair)
+
+;2.70
+(define 50s-rock-syllables-tree (generate-huffman-tree '((BOOM 1)(A 2)(GET 2)(JOB 2)(NA 16)(SHA 3)(YIP 9)(WAH 1))))
+(define 50s-message '(GET A JOB SHA NA NA NA NA NA NA NA NA NA GET A JOB SHA NA NA NA NA NA NA NA NA NA WAH YIP YIP YIP YIP YIP YIP YIP YIP YIP SHA BOOM))
+(length(encode 50s-message 50s-rock-syllables-tree))
+(length 50s-message)
+(* 3(length 50s-message))
+
+2.72
+leaf-set4
+(generate-huffman-tree '((A 16)(B 8)(C 4)(D 2)(E 1)))
