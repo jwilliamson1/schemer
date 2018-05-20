@@ -14,10 +14,13 @@
            (post "Second Post"
                  "This is another post"
                  (list)))))
+  
   (define the-blog
     (with-handlers ([exn? log-missing-exn-handler])
       (with-input-from-file home read)))
+  
   (set-blog-home! the-blog (path->string home))
+  
   the-blog)
  
 ; start: request -> doesn't return

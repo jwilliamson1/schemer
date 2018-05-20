@@ -174,8 +174,6 @@ backToRect
   (define (operator exp) (car exp))
   (define (operands exp) (cdr exp))
   
-
-  
   (define (deriv-sum exp var)
     (make-sum (deriv (addend exp) var)
               (deriv (augend exp) var)))
@@ -212,4 +210,4 @@ backToRect
    exp var))
 
 (deriv '(* 34 x) 'x)
-        
+       
