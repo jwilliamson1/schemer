@@ -129,10 +129,10 @@ backToRect
   
   (define (multiplier p) (cadr p))
   
-  (define (make-sum-list l) 
-    (if (= (length l) 2) 
-        (list '+ (car l) (cadr l)) 
-        (make-sum (car l) (make-sum-list (cdr l)))))
+   (define (make-sum-list l) 
+   (if (= (length l) 2) 
+       (list '+ (car l) (cadr l)) 
+       (make-sum (car l) (make-sum-list (cdr l)))))
   
  (define (make-sum a1 a2) 
    (cond ((=number? a1 0) a2) 
@@ -159,8 +159,7 @@ backToRect
          (make-sum-list a))))
 
  (define (multiplicand p) 
-   (let ((m (cddr p)))
-     (displayln p)
+   (let ((m (cddr p))) 
      (if (= (length m) 1) 
          (car m) 
          (make-product-list m))))
@@ -180,7 +179,6 @@ backToRect
               (deriv (augend exp) var)))
   
   (define (deriv-product exp var)
-    (displayln exp)
     (make-sum
            (make-product 
             (multiplier exp)
@@ -196,7 +194,7 @@ backToRect
                1 
                0))
           (else ((get 'deriv (operator exp)) 
-                 exp
+                 (operands exp) 
                  var))))
   
   (put 'deriv '+ deriv-sum)
@@ -211,5 +209,5 @@ backToRect
   ((get 'deriv 'deriv)
    exp var))
 
-(deriv '(* y x) 'x)
+(deriv '(* 34 x) 'x)
        
