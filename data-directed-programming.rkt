@@ -120,6 +120,13 @@ backToRect
   
   (define (=number? exp num)
     (and (number? exp) (= exp num)))
+    
+  (define (variable? x) (symbol? x))
+  
+  (define (same-variable? v1 v2)
+    (and (variable? v1)
+         (variable? v2)
+         (eq? v1 v2)))
   
   (define (addend s) (cadr s))
   
@@ -159,13 +166,7 @@ backToRect
      (if (= (length m) 1) 
          (car m) 
          (make-product-list m))))
-  
-  (define (variable? x) (symbol? x))
-  
-  (define (same-variable? v1 v2)
-    (and (variable? v1)
-         (variable? v2)
-         (eq? v1 v2)))
+
   
   (define (operator exp) (car exp))
   (define (operands exp) (cdr exp))
@@ -183,6 +184,26 @@ backToRect
             (deriv (multiplier exp) var)
             (multiplicand exp))))
 
+  (define (base e) (cadr e))
+
+  (define (exponent e) (caddr e))
+
+  (define (make-exponentiation b e)
+  (cond((and (=number? b 0)(=number? e 0))error "Zero to the zeroth power is undefined.")
+       ((=number? e 0) 1)
+       ((=number? e 1) b)
+       ((and (number? b) (number? e)) 
+        (expt b e))
+       (else (list '^ b e))))
+
+  (define (deriv-exponent exp var)
+             (make-product
+          (make-product (exponent exp)
+                        (make-exponentiation
+                         (base exp)
+                         (- (exponent exp) 1)))
+          (deriv (base exp) var)))
+
     (define (deriv exp var)
     (cond ((number? exp) 0)
           ((variable? exp) 
@@ -195,7 +216,7 @@ backToRect
   
   (put 'deriv '+ deriv-sum)
   (put 'deriv '* deriv-product)
-  (put 'deriv '^ deriv-product)
+  (put 'deriv '^ deriv-exponent)
   (put 'deriv 'deriv deriv)
   'done)
 
@@ -209,3 +230,5 @@ backToRect
 (deriv '(* x y) 'x) ; y
 (deriv '(* x 3 y) 'x); 3 * y
 (deriv '(* (* y x)(+ x 3)) 'x)
+(deriv '(+ (* a (^ x 2))(* b x) c) 'x)
+(deriv '(^ 10 (^ x 2)) 'x)
