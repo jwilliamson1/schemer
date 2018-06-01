@@ -115,10 +115,6 @@ samePolar
 (define backToRect (make-from-real-imag (real-part samePolar)(imag-part samePolar)))
 backToRect
 
-
-
-
-
 ;cannot add same-variable and number because they don't have operators
 (define (install-deriv-package)
   
@@ -160,7 +156,6 @@ backToRect
 
  (define (multiplicand p) 
    (let ((m (cddr p)))
-     (displayln p)
      (if (= (length m) 1) 
          (car m) 
          (make-product-list m))))
@@ -180,7 +175,6 @@ backToRect
               (deriv (augend exp) var)))
   
   (define (deriv-product exp var)
-    (displayln exp)
     (make-sum
            (make-product 
             (multiplier exp)
@@ -211,5 +205,7 @@ backToRect
   ((get 'deriv 'deriv)
    exp var))
 
-(deriv '(* y x) 'x)
-       
+(deriv '(+ x 3) 'x) ;1
+(deriv '(* x y) 'x) ; y
+(deriv '(* x 3 y) 'x); 3 * y
+(deriv '(* (* y x)(+ x 3)) 'x)
