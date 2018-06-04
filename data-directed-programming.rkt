@@ -120,7 +120,7 @@ backToRect
   
   (define (=number? exp num)
     (and (number? exp) (= exp num)))
-    
+  
   (define (variable? x) (symbol? x))
   
   (define (same-variable? v1 v2)
@@ -128,14 +128,26 @@ backToRect
          (variable? v2)
          (eq? v1 v2)))
   
-  (define (addend s) (cadr s))
+  (define (addend s) (car s))
   
-  (define (multiplier p) (cadr p))
+  (define (augend s) 
+    (let ((a (cdr s))) 
+      (if (= (length a) 1) 
+          (car a) 
+          (make-sum-list a))))
   
   (define (make-sum-list l) 
     (if (= (length l) 2) 
         (list '+ (car l) (cadr l)) 
         (make-sum (car l) (make-sum-list (cdr l)))))
+
+ (define (multiplier p) (car p))
+
+ (define (multiplicand p) 
+   (let ((m (cdr p)))
+     (if (= (length m) 1) 
+         (car m) 
+         (make-product-list m))))
   
  (define (make-sum a1 a2) 
    (cond ((=number? a1 0) a2) 
@@ -143,7 +155,8 @@ backToRect
          ((and (number? a1) (number? a2)) (+ a1 a2)) 
          (else (make-sum-list (list a1 a2))))) 
   
- (define (make-product-list l) 
+ (define (make-product-list l)
+   (displayln l)
    (if (= (length l) 2) 
        (list '* (car l) (cadr l)) 
        (make-product (car l) (make-product-list (cdr l)))))
@@ -154,22 +167,14 @@ backToRect
          ((=number? m2 1) m1) 
          ((and (number? m1) (number? m2)) (* m1 m2)) 
          (else (make-product-list (list m1 m2))))) 
-  
- (define (augend s) 
-   (let ((a (cddr s))) 
-     (if (= (length a) 1) 
-         (car a) 
-         (make-sum-list a))))
 
- (define (multiplicand p) 
-   (let ((m (cddr p)))
-     (if (= (length m) 1) 
-         (car m) 
-         (make-product-list m))))
-
-  
-  (define (operator exp) (car exp))
-  (define (operands exp) (cdr exp))
+  (define (make-operand-list l oper make-operand-func) 
+    (if (= (length l) 2) 
+        (list oper (car l) (cadr l)) 
+        (make-operand-func (car l) (make-operand-list
+                                    (cdr l)
+                                    oper
+                                    make-operand-func))))
   
   (define (deriv-sum exp var)
     (make-sum (deriv (addend exp) var)
@@ -184,26 +189,29 @@ backToRect
             (deriv (multiplier exp) var)
             (multiplicand exp))))
 
-  (define (base e) (cadr e))
+  (define (base e) (car e))
 
-  (define (exponent e) (caddr e))
+  (define (exponent e) (cadr e))
 
+  
   (define (make-exponentiation b e)
-  (cond((and (=number? b 0)(=number? e 0))error "Zero to the zeroth power is undefined.")
-       ((=number? e 0) 1)
-       ((=number? e 1) b)
-       ((and (number? b) (number? e)) 
-        (expt b e))
-       (else (list '^ b e))))
+    (cond((and (=number? b 0)(=number? e 0))error "Zero to the zeroth power is undefined.")
+         ((=number? e 0) 1)
+         ((=number? e 1) b)
+         ((and (number? b) (number? e)) (expt b e))
+         (else (list '^ b e))))
+  
+  (define (deriv-exponentiation expr var)
+    (make-product
+     (make-product (exponent expr)
+                   (make-exponentiation
+                    (base expr)
+                    (- (exponent expr) 1)))
+     (deriv (base expr) var)))
 
-  (define (deriv-exponent exp var)
-             (make-product
-          (make-product (exponent exp)
-                        (make-exponentiation
-                         (base exp)
-                         (- (exponent exp) 1)))
-          (deriv (base exp) var)))
-
+  (define (operator exp) (car exp))
+  (define (operands exp) (cdr exp))
+  
     (define (deriv exp var)
     (cond ((number? exp) 0)
           ((variable? exp) 
@@ -211,12 +219,12 @@ backToRect
                1 
                0))
           (else ((get 'deriv (operator exp)) 
-                 exp
+                 (operands exp)
                  var))))
   
   (put 'deriv '+ deriv-sum)
   (put 'deriv '* deriv-product)
-  (put 'deriv '^ deriv-exponent)
+  (put 'deriv '^ deriv-exponentiation)
   (put 'deriv 'deriv deriv)
   'done)
 
@@ -231,4 +239,4 @@ backToRect
 (deriv '(* x 3 y) 'x); 3 * y
 (deriv '(* (* y x)(+ x 3)) 'x)
 (deriv '(+ (* a (^ x 2))(* b x) c) 'x)
-(deriv '(^ 10 (^ x 2)) 'x)
+(deriv '(^ x (^ x 9)) 'x)
