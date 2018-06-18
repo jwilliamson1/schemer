@@ -180,7 +180,7 @@ rght-sz
     (define (key record-row)
     (car record-row))
   (cond ((null? set-of-records) false)
-        ((= given-key (key(entry set-of-records))) (entry set-of-records))
+        ((= given-key (key(entry set-of-records))) entry set-of-records)
         ((< given-key (key(entry set-of-records)))
          (db-lookup given-key (left-branch set-of-records)))
         (else 
@@ -196,4 +196,4 @@ rght-sz
         (else 
          (db-lookup-string given-key (right-branch set-of-records)))))
 
-(db-lookup 2 db1)
+(db-lookup 6 db1)
