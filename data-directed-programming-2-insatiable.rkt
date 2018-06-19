@@ -96,7 +96,9 @@ file-2
 (define (install-division-A-file-retrieval-system)
  
   (define (get-div-A-record name records)
-    (filter (lambda(x)(string=? name (car x))) records))
+    (let ((result-list (filter (lambda(x)(string=? name (car x))) records)))
+      (if (not result-list) result-list
+          (car result-list))))
 
   (define (get-div-B-record name records)
     (db-lookup-string name records))
@@ -104,7 +106,7 @@ file-2
   (define (get-record name all-files)    
     ((get 'get-record (type-tag all-files)) name (contents all-files)))
 
-  (put 'get-reoord 'div-b get-div-B-record)
+  (put 'get-record 'div-b get-div-B-record)
   (put 'get-record 'div-a get-div-A-record)  
   (put 'get-record 'get-record get-record)
   'done)
@@ -117,4 +119,5 @@ file-2
 file-1
 file-2
 
-;(get-record "Joseph Williamson" file-2)
+(get-record "Joseph Williamson" file-1)
+(get-record "zaphod breezlbrox" file-2)
