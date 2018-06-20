@@ -97,7 +97,7 @@ file-2
  
   (define (get-div-A-record name records)
     (let ((result-list (filter (lambda(x)(string=? name (car x))) records)))
-      (if (not result-list) result-list
+      (if (null? result-list) #f
           (car result-list))))
 
   (define (get-div-B-record name records)
@@ -120,4 +120,6 @@ file-1
 file-2
 
 (get-record "Joseph Williamson" file-1)
+(get-record "nope" file-1)
 (get-record "zaphod breezlbrox" file-2)
+(get-record "nuh uh" file-2)
