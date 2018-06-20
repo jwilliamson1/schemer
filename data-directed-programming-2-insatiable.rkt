@@ -98,24 +98,38 @@ file-2
   (define (get-div-A-record name records)
     (let ((result-list (filter (lambda(x)(string=? name (car x))) records)))
       (if (null? result-list) #f
-          (car result-list))))
-
-  (define (get-div-B-record name records)
-    (db-lookup-string name records))
+          (attach-tag 'div-a (car result-list)))))
 
   (define (get-record name all-files)    
     ((get 'get-record (type-tag all-files)) name (contents all-files)))
 
-  (put 'get-record 'div-b get-div-B-record)
   (put 'get-record 'div-a get-div-A-record)  
   (put 'get-record 'get-record get-record)
   'done)
 
 (install-division-A-file-retrieval-system)
 
+;division a uses a simple table structure
+(define (install-division-B-file-retrieval-system)
+
+  (define (get-div-B-record name records)
+    (let ((result-list (db-lookup-string name records)))
+      (if (not result-list) result-list
+          (attach-tag 'div-b result-list))))
+
+  (define (get-record name all-files)    
+    ((get 'get-record (type-tag all-files)) name (contents all-files)))
+
+  (put 'get-record 'div-b get-div-B-record)
+  (put 'get-record 'get-record get-record)
+  'done)
+
+(install-division-B-file-retrieval-system)
+
 (define (get-record name records)
   ((get 'get-record
        'get-record) name records))
+
 file-1
 file-2
 
