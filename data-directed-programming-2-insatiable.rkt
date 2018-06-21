@@ -77,6 +77,7 @@
                                     (div-B-rec "monty pyton" 65 "0" "anarchist")                                                                        
                                     (div-B-rec "zaphod breezlbrox" 15549 "23,000,000,000" "charlatan")))))
 
+
                                                 
 file-2
 
@@ -132,7 +133,7 @@ file-2
 
 (install-division-B-file-retrieval-system)
 
-(define (get-record name records)
+(define (get-record-from-file name records)
   ((get 'get-record(type-tag records)) name (contents records)))
 
 (define (get-salary record)
@@ -141,10 +142,31 @@ file-2
 file-1
 file-2
 
-(get-record "Joseph Williamson" file-1)
-(get-record "nope" file-1)
-(get-record "zaphod breezlbrox" file-2)
-(get-record "nuh uh" file-2)
+(define (get-record-from-network name files)
+  (if (null? files) #f
+      (let((result (get-record-from-file name (car files))))
+        (if (not (eq? #f result)) result
+            (get-record-from-network name (cdr files))))))
 
-(get-salary(get-record "Joseph Williamson" file-1))
-(get-salary(get-record "zaphod breezlbrox" file-2))
+(get-record-from-file "Joseph Williamson" file-1)
+(get-record-from-file "zaphod breezlbrox" file-1)
+(get-record-from-file "zaphod breezlbrox" file-2)
+(get-record-from-file "Joseph Williamson" file-2)
+
+(get-salary(get-record-from-file "Joseph Williamson" file-1))
+(get-salary(get-record-from-file "zaphod breezlbrox" file-2))
+
+(define all-files (list file-1 file-2))
+all-files
+(get-salary(get-record-from-network "archema" all-files))
+(get-salary(get-record-from-network "Cardi B" all-files))
+
+;what to change when adding a new file
+;add tag to file's data
+;create installer
+;add get record function that adds tag to record
+;add get salary function 
+;add get new type to functions table
+;run installer
+
+
