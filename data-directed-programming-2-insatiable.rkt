@@ -100,9 +100,6 @@ file-2
       (if (null? result-list) #f
           (attach-tag 'div-a-file (car result-list)))))
 
-  (define (get-record name all-files)    
-    ((get 'get-record (type-tag all-files)) name (contents all-files)))
-
   (define (get-salary record)
     (caddr record))
 
@@ -110,7 +107,6 @@ file-2
     (get-salary record))
 
   (put 'get-record 'div-a get-div-A-record)  
-  (put 'get-record 'get-record get-record)
   (put 'get-salary 'div-a-file get-salary)
   'done)
 
@@ -124,9 +120,6 @@ file-2
       (if (not result-list) result-list
           (attach-tag 'div-b-file result-list))))
 
-  (define (get-record name all-files)    
-    ((get 'get-record (type-tag all-files)) name (contents all-files)))
-
   (define (get-salary record)
     (caadr record))
 
@@ -134,15 +127,13 @@ file-2
     (get-salary record))
 
   (put 'get-record 'div-b get-div-B-record)
-  (put 'get-record 'get-record get-record)
   (put 'get-salary 'div-b-file get-salary)
   'done)
 
 (install-division-B-file-retrieval-system)
 
 (define (get-record name records)
-  ((get 'get-record
-       'get-record) name records))
+  ((get 'get-record(type-tag records)) name (contents records)))
 
 (define (get-salary record)
   ((get 'get-salary (type-tag record)) (contents record))) 
