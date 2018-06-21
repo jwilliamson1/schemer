@@ -62,7 +62,7 @@
               CONTENTS" datum)))
 
 (define (div-A-rec name age salary dept)
-  (list name (list age salary dept)))
+  (list name age salary dept))
 
 (define (div-B-rec name age salary dept)
   (list name (list salary age dept)))
@@ -98,13 +98,20 @@ file-2
   (define (get-div-A-record name records)
     (let ((result-list (filter (lambda(x)(string=? name (car x))) records)))
       (if (null? result-list) #f
-          (attach-tag 'div-a (car result-list)))))
+          (attach-tag 'div-a-file (car result-list)))))
 
   (define (get-record name all-files)    
     ((get 'get-record (type-tag all-files)) name (contents all-files)))
 
+  (define (get-salary record)
+    (caddr record))
+
+    (define (get-salary-export record)
+    (get-salary record))
+
   (put 'get-record 'div-a get-div-A-record)  
   (put 'get-record 'get-record get-record)
+  (put 'get-salary 'div-a-file get-salary)
   'done)
 
 (install-division-A-file-retrieval-system)
@@ -115,13 +122,20 @@ file-2
   (define (get-div-B-record name records)
     (let ((result-list (db-lookup-string name records)))
       (if (not result-list) result-list
-          (attach-tag 'div-b result-list))))
+          (attach-tag 'div-b-file result-list))))
 
   (define (get-record name all-files)    
     ((get 'get-record (type-tag all-files)) name (contents all-files)))
 
+  (define (get-salary record)
+    (caadr record))
+
+  (define (get-salary-export record)
+    (get-salary record))
+
   (put 'get-record 'div-b get-div-B-record)
   (put 'get-record 'get-record get-record)
+  (put 'get-salary 'div-b-file get-salary)
   'done)
 
 (install-division-B-file-retrieval-system)
@@ -130,6 +144,9 @@ file-2
   ((get 'get-record
        'get-record) name records))
 
+(define (get-salary record)
+  ((get 'get-salary (type-tag record)) (contents record))) 
+
 file-1
 file-2
 
@@ -137,3 +154,6 @@ file-2
 (get-record "nope" file-1)
 (get-record "zaphod breezlbrox" file-2)
 (get-record "nuh uh" file-2)
+
+(get-salary(get-record "Joseph Williamson" file-1))
+(get-salary(get-record "zaphod breezlbrox" file-2))
