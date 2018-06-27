@@ -52,3 +52,6 @@
 ;DATA DIRECTED PROGRAMMING
 ;this method prefers systems where new functions are being added since once a generic interface is developed to the primitives of the domain newer functionality can be more easily applied
 ;this requires generally only adding a new proc and adding to the install table for each object, and then providing access to that table function once externally.
+
+;MESSAGE PASSING
+;The advantage of message passing in a large system comes when you have many types with a similar interface, but different functionality
