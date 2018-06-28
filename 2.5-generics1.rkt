@@ -53,6 +53,8 @@
        (lambda (x) (tag x)))
   (put 'equ? '(scheme-number scheme-number)
        (lambda (x y)  (= x y)))
+  (put '=zero? '(scheme-number)
+       (lambda (x) (= x 0)))
   'done)
 
 (install-scheme-number-package)
@@ -62,8 +64,10 @@
 
 (apply-generic 'equ? (make-scheme-number 3)(make-scheme-number 3))
 (apply-generic 'equ? (make-scheme-number 5)(make-scheme-number 5))
-
-
+(display "=zero? should be false: " )
+(apply-generic '=zero? (make-scheme-number 4))
+(display "=zero? should be true: " )
+(apply-generic '=zero? (make-scheme-number 0))
 
 ;; rational package
 (define (install-rational-package)
@@ -90,6 +94,8 @@
   (define (equ?-rat r1 r2)
     (and (= (numer r1)(numer r2))
          (= (denom r1)(denom r2))))
+  (define (=zero?-rat r)
+    (= (numer r) 0))
   ;; interface to rest of the system
   (define (tag x) (attach-tag 'rational x))
   (put 'add '(rational rational)
@@ -104,6 +110,8 @@
        (lambda (n d) (tag (make-rat n d))))
   (put 'equ? '(rational rational)
        (lambda (x y) (equ?-rat x y)))
+  (put '=zero? '(rational)
+       (lambda (x) (=zero?-rat x)))
   'done)
 
 (install-rational-package)
@@ -119,6 +127,12 @@
 (apply-generic 'equ? r1 r2)
 (displayln "should be false")
 (apply-generic 'equ? r1 r3)
+
+(define r4 (make-rational 0 5))
+(display "=zero? r4 should be true: ")
+(apply-generic '=zero? r4)
+(display "=zero? r3 should be false: ")
+(apply-generic '=zero? r3)
 
 (define (install-rectangular-package)
   ;; internal procedures
