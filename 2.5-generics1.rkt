@@ -51,6 +51,8 @@
        (lambda (x y) (tag (/ x y))))
   (put 'make 'scheme-number
        (lambda (x) (tag x)))
+  (put 'equ? '(scheme-number scheme-number)
+       (lambda (x y)  (= x y)))
   'done)
 
 (install-scheme-number-package)
@@ -58,7 +60,10 @@
 (define (make-scheme-number n)
   ((get 'make 'scheme-number) n))
 
-(make-scheme-number 3)
+(apply-generic 'equ? (make-scheme-number 3)(make-scheme-number 3))
+(apply-generic 'equ? (make-scheme-number 5)(make-scheme-number 5))
+
+
 
 ;; rational package
 (define (install-rational-package)
@@ -82,6 +87,9 @@
   (define (div-rat x y)
     (make-rat (* (numer x) (denom y))
               (* (denom x) (numer y))))
+  (define (equ?-rat r1 r2)
+    (and (= (numer r1)(numer r2))
+         (= (denom r1)(denom r2))))
   ;; interface to rest of the system
   (define (tag x) (attach-tag 'rational x))
   (put 'add '(rational rational)
@@ -94,12 +102,23 @@
        (lambda (x y) (tag (div-rat x y))))
   (put 'make 'rational
        (lambda (n d) (tag (make-rat n d))))
+  (put 'equ? '(rational rational)
+       (lambda (x y) (equ?-rat x y)))
   'done)
 
 (install-rational-package)
 
 (define (make-rational n d)
   ((get 'make 'rational) n d))
+
+(define r1 (make-rational 3 4))
+(define r2 (make-rational 75 100))
+(define r3 (make-rational 2 3))
+
+(displayln "should be true")
+(apply-generic 'equ? r1 r2)
+(displayln "should be false")
+(apply-generic 'equ? r1 r3)
 
 (define (install-rectangular-package)
   ;; internal procedures
@@ -115,6 +134,9 @@
     (atan (imag-part z) (real-part z)))
   (define (make-from-mag-ang r a)
     (cons (* r (cos a)) (* r (sin a))))
+  (define (equ? p1 p2)
+    ((and (= (real-part p1)(real-part p2))
+          (= (imag-part p1)(imag-part p2)))))
   ;; interface to the rest of the system
   (define (tag x) 
     (attach-tag 'rectangular x))
@@ -128,6 +150,7 @@
   (put 'make-from-mag-ang 'rectangular
        (lambda (r a) 
          (tag (make-from-mag-ang r a))))
+  (put 'equ? '(rectangular) equ?)
   'done)
 
 (install-rectangular-package)
@@ -145,6 +168,9 @@
   (define (make-from-real-imag x y)
     (cons (sqrt (+ (square x) (square y)))
           (atan y x)))
+  (define (equ? p1 p2)
+    (and (= (magnitude p1)(magnitude p2))
+          (= (angle p1)(angle p2))))
   ;; interface to the rest of the system
   (define (tag x) (attach-tag 'polar x))
   (put 'real-part '(polar) real-part)
@@ -157,9 +183,25 @@
   (put 'make-from-mag-ang 'polar
        (lambda (r a) 
          (tag (make-from-mag-ang r a))))
+  (put 'equ? '(polar polar) equ?)
   'done)
 
 (install-polar-package)
+
+(define (make-from-mag-ang r a)
+  ((get 'make-from-real-imag 'polar) r a))
+
+(define (equ?-polar r a)
+  ((get 'equ? '(polar polar)) r a))
+
+(define p1 (make-from-mag-ang 5 3))
+(define p2 (make-from-mag-ang 5 3))
+(define p3 (make-from-mag-ang 5 4))
+
+(displayln "Should be true")
+(apply-generic 'equ? p1 p2)
+(displayln "Should be false")
+(apply-generic 'equ? p1 p3)
 
 (define (real-part c)
   (apply-generic 'real-part c))
@@ -185,6 +227,9 @@
     ((get 'make-from-mag-ang 'polar) 
      r a))
   ;; internal procedures
+  (define (equ?-complex z1 z2)
+    (and (= (real-part z1)(real-part z2))
+         (= (imag-part z1)(imag-part z2))))
   (define (add-complex z1 z2)
     (make-from-real-imag 
      (+ (real-part z1) (real-part z2))
@@ -203,6 +248,9 @@
      (- (angle z1) (angle z2))))
   ;; interface to rest of the system
   (define (tag z) (attach-tag 'complex z))
+  (put 'equ? '(complex complex)
+       (lambda (z1 z2)
+         (equ?-complex z1 z2)))
   (put 'add '(complex complex)
        (lambda (z1 z2)
          ;re-tag as complex
@@ -226,6 +274,9 @@
   (put 'imag-part '(complex) imag-part)
   (put 'magnitude '(complex) magnitude)
   (put 'angle '(complex) angle)
+  (put 'equ? '(complex complex)
+       (lambda (z1 z2)
+         (equ?-complex z1 z2)))
   'done)
 
 (install-complex-package)
@@ -237,7 +288,7 @@
 
 (define z1 (make-complex-from-mag-ang  10 2))
 (define z2 (make-complex-from-real-imag 3 4))
-
+(define z3 (make-complex-from-mag-ang  10 2))
 
 (apply-generic 'add  z1 z2)
 (apply-generic 'sub  z1 z2)
@@ -250,6 +301,9 @@
 (apply-generic 'real-part z2)
 
 (apply-generic 'add 2 7)
+
+(apply-generic 'equ? z1 z2)
+(apply-generic 'equ? z1 z3)
 
 ;2.77 apply generic is called once which looks up magnitude with type complex which returns the maginude function
 ;which is setup with apply generic which looks up the type polar or rectangular and applies th respective magnitude function
