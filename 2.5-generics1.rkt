@@ -241,6 +241,8 @@
     ((get 'make-from-mag-ang 'polar) 
      r a))
   ;; internal procedures
+  (define (=zero?-complex z)
+    (= (real-part z)(imag-part z)))
   (define (equ?-complex z1 z2)
     (and (= (real-part z1)(real-part z2))
          (= (imag-part z1)(imag-part z2))))
@@ -262,6 +264,9 @@
      (- (angle z1) (angle z2))))
   ;; interface to rest of the system
   (define (tag z) (attach-tag 'complex z))
+  (put '=zero? '(complex)
+       (lambda (z)
+         (=zero?-complex z)))
   (put 'equ? '(complex complex)
        (lambda (z1 z2)
          (equ?-complex z1 z2)))
@@ -288,9 +293,6 @@
   (put 'imag-part '(complex) imag-part)
   (put 'magnitude '(complex) magnitude)
   (put 'angle '(complex) angle)
-  (put 'equ? '(complex complex)
-       (lambda (z1 z2)
-         (equ?-complex z1 z2)))
   'done)
 
 (install-complex-package)
@@ -321,3 +323,8 @@
 
 ;2.77 apply generic is called once which looks up magnitude with type complex which returns the maginude function
 ;which is setup with apply generic which looks up the type polar or rectangular and applies th respective magnitude function
+
+(define z0 (make-complex-from-real-imag 0 0))
+
+(apply-generic '=zero? z1)
+(apply-generic '=zero? z0)
