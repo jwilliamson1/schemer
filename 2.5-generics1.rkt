@@ -241,6 +241,8 @@
     ((get 'make-from-mag-ang 'polar) 
      r a))
   ;; internal procedures
+  (define (=zero?-complex z)
+    (= (real-part z)(imag-part z) 0))
   (define (equ?-complex z1 z2)
     (and (= (real-part z1)(real-part z2))
          (= (imag-part z1)(imag-part z2))))
@@ -291,6 +293,9 @@
   (put 'equ? '(complex complex)
        (lambda (z1 z2)
          (equ?-complex z1 z2)))
+  (put '=zero '(complex)
+       (lambda (z)
+         (=zero?-complex z)))
   'done)
 
 (install-complex-package)
