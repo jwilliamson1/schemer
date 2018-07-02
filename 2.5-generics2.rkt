@@ -1,7 +1,10 @@
 #lang racket
-(define *the-table* (make-hash));make THE table 
+(define *the-table* (make-hash));make THE table
+(define *coercion-table* (make-hash));make THE table 
 (define (put key1 key2 value) (hash-set! *the-table* (list key1 key2) value));put 
 (define (get key1 key2) (hash-ref *the-table* (list key1 key2) #f));get
+(define (put-coercion key1 key2 value) (hash-set! *coercion-table* (list key1 key2) value))
+(define (get-coercion key1 key2) (hash-ref *coercion-table* (list key1 key2) #f));get
 
 (define (attach-tag type-tag contents)
   (if (number? contents)
@@ -22,14 +25,36 @@
               CONTENTS" datum))))
 
 (define (apply-generic op . args)
+  (define (no-method type-tags)
+    (error 
+     "No method for these types"
+     (list op type-tags)))
   (let ((type-tags (map type-tag args)))
     (let ((proc (get op type-tags)))
       (if proc
           (apply proc (map contents args))
-          (error
-            "No method for these types: 
-             APPLY-GENERIC"
-            (list op type-tags))))))
+          (if (and (= (length args) 2))
+              (let ((type1 (car type-tags))
+                    (type2 (cadr type-tags))
+                    (a1 (car args))
+                    (a2 (cadr args)))
+                (if (eq? type1 type2)
+                    (no-method type-tags)
+                    (let ((t1->t2 
+                           (get-coercion type1
+                                         type2))
+                          (t2->t1 
+                           (get-coercion type2 
+                                         type1)))
+                      (cond (t1->t2
+                             (apply-generic 
+                              op (t1->t2 a1) a2))
+                            (t2->t1
+                             (apply-generic 
+                              op a1 (t2->t1 a2)))
+                            (else
+                             (no-method type-tags))))))
+              (no-method type-tags))))))
 
 (define (add x y) (apply-generic 'add x y))
 (define (sub x y) (apply-generic 'sub x y))
@@ -39,6 +64,8 @@
 
 ;; scheme numbers
 (define (install-scheme-number-package)
+  (define (exp x y) 
+  (apply-generic 'exp x y))
   (define (tag x)
     (attach-tag 'scheme-number x))
   (put 'add '(scheme-number scheme-number)
@@ -55,6 +82,10 @@
        (lambda (x y)  (= x y)))
   (put '=zero? '(scheme-number)
        (lambda (x) (= x 0)))
+  (put 'exp 
+     '(scheme-number scheme-number)
+     (lambda (x y) 
+       (tag (expt x y)))) 
   'done)
 
 (install-scheme-number-package)
@@ -242,11 +273,7 @@
      r a))
   ;; internal procedures
   (define (=zero?-complex z)
-<<<<<<< HEAD
-    (= (real-part z)(imag-part z) 0))
-=======
     (= (real-part z)(imag-part z)))
->>>>>>> f846b1cc68ba467971f338ea2ff924bcbcaa3dfd
   (define (equ?-complex z1 z2)
     (and (= (real-part z1)(real-part z2))
          (= (imag-part z1)(imag-part z2))))
@@ -297,15 +324,6 @@
   (put 'imag-part '(complex) imag-part)
   (put 'magnitude '(complex) magnitude)
   (put 'angle '(complex) angle)
-<<<<<<< HEAD
-  (put 'equ? '(complex complex)
-       (lambda (z1 z2)
-         (equ?-complex z1 z2)))
-  (put '=zero '(complex)
-       (lambda (z)
-         (=zero?-complex z)))
-=======
->>>>>>> f846b1cc68ba467971f338ea2ff924bcbcaa3dfd
   'done)
 
 (install-complex-package)
@@ -341,3 +359,21 @@
 
 (apply-generic '=zero? z1)
 (apply-generic '=zero? z0)
+
+(define (scheme-number->complex n)
+  (make-complex-from-real-imag 
+   (contents n) 0))
+
+(put-coercion 'scheme-number 'complex 
+              scheme-number->complex)
+
+(define (scheme-number->scheme-number n) n)
+(define (complex->complex z) z)
+
+(put-coercion 'scheme-number 'scheme-number
+              scheme-number->scheme-number)
+
+(put-coercion 'complex 'complex 
+              complex->complex)
+
+(apply-generic 'exp z1 z2)
