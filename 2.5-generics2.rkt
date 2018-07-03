@@ -56,6 +56,18 @@
                              (no-method type-tags))))))
               (no-method type-tags))))))
 
+(define (apply-gen op . args)
+  ;handle errors
+    (define (no-method type-tags)
+    (error 
+     "No method for these types"
+     (list op type-tags)))
+  
+  (define (apply-gen-iter coerced-types . args)
+    (let ((proc (get op type-tags)))
+      (if proc
+          (apply proc (map content args))
+
 (define (add x y) (apply-generic 'add x y))
 (define (sub x y) (apply-generic 'sub x y))
 (define (mul x y) (apply-generic 'mul x y))

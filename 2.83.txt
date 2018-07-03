@@ -1,0 +1,19 @@
+complex rat scheme
+
+complex complex complex 
+
+scheme rat complex
+
+1st fails can't make rat complex
+
+2nd 
+
+rat rat -can't make complex rat
+
+3rd 
+
+can make all complex
+
+apply all operations at the end or as processing?
+
+iterative?
