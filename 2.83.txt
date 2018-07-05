@@ -17,3 +17,10 @@ can make all complex
 apply all operations at the end or as processing?
 
 iterative?
+
+
+try to get through list of numbers and if we get to null at the end we good
+
+if not cdr to the next item
+
+apply to each pair if last pair is null we done
