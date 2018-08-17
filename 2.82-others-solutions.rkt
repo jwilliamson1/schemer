@@ -1,62 +1,123 @@
-#lang racket
-(define *the-table* (make-hash));make THE table
-(define *coercion-table* (make-hash));make THE table 
-(define (put key1 key2 value) (hash-set! *the-table* (list key1 key2) value));put 
-(define (get key1 key2) (hash-ref *the-table* (list key1 key2) #f));get
-(define (put-coercion key1 key2 value) (hash-set! *coercion-table* (list key1 key2) value))
-(define (get-coercion key1 key2) (hash-ref *coercion-table* (list key1 key2) #f));get
+#lang sicp
+;(define *the-table* (make-hash));make THE table
+;(define *coercion-table* (make-hash));make THE table 
+;(define (put key1 key2 value) (hash-set! *the-table* (list key1 key2) value));put 
+;(define (get key1 key2) (hash-ref *the-table* (list key1 key2) #f));get
+;(define (put-coercion key1 key2 value) (hash-set! *coercion-table* (list key1 key2) value))
+;(define (get-coercion key1 key2) (hash-ref *coercion-table* (list key1 key2) #f));get
+
+(define global-array '())
+
+(define (make-entry k v) (list k v))
+(define (key entry) (car entry))
+(define (value entry) (cadr entry))
+
+(define (put op type item)
+  (define (put-helper k array)
+    (cond ((null? array) (list(make-entry k item)))
+          ((equal? (key (car array)) k) array)
+          (else (cons (car array) (put-helper k (cdr array))))))
+  (set! global-array (put-helper (list op type) global-array)))
+
+(define (put-coercion op type item)
+  (define (put-helper k array)
+    (cond ((null? array) (list(make-entry k item)))
+          ((equal? (key (car array)) k) array)
+          (else (cons (car array) (put-helper k (cdr array))))))
+  (set! global-array (put-helper (list op type) global-array)))
+
+(define (get op type)
+  (define (get-helper k array)
+    (cond ((null? array) #f)
+          ((equal? (key (car array)) k) (value (car array)))
+          (else (get-helper k (cdr array)))))
+  (get-helper (list op type) global-array))
+
+(define (get-coercion op type)
+  (define (get-helper k array)
+    (cond ((null? array) #f)
+          ((equal? (key (car array)) k) (value (car array)))
+          (else (get-helper k (cdr array)))))
+  (get-helper (list op type) global-array))
 
 (define (attach-tag type-tag contents)
-  (if (exact-integer? contents)
+  (if (integer? contents)
       contents
       (cons type-tag contents)))
 
 (define (type-tag datum)
-  (cond ((exact-integer? datum) 'scheme-number)           
+  (cond ((integer? datum) 'scheme-number)           
         ((pair? datum)(car datum))
         (else
       (error "Bad tagged datum: 
               TYPE-TAG" datum))))
 
 (define (contents datum)
-  (cond ((exact-integer? datum) datum)   
+  (cond ((integer? datum) datum)   
         ((pair? datum)(cdr datum))
         (else(error "Bad tagged datum: 
               CONTENTS" datum))))
 
- ;;iter returns the list of coerced argument or gives an error on failing to find a method. 
+ (define (filter proc seq) 
+   (cond ((null? seq) nil) 
+         ((proc (car seq)) 
+          (cons (car seq) (filter proc (cdr seq)))) 
+         (else 
+          (filter proc (cdr seq)))))
+
+(define (andmap f xs)
+    (cond ((null? xs) #t)
+          ((f (car xs))
+            (andmap f (cdr xs)))
+          (else #f)))
+
+(define (ormap f xs)
+    (cond ((null? xs) #f)
+          ((f (car xs)) #t)
+          (else (ormap f (cdr xs)))))
   
- (define (apply-generic op . args) 
- (define (iter type-tags args) 
-     (if (null? type-tags) 
-         (error "No method for these types-ITER") 
-         (let ((type1 (car type-tags))) 
-           (let ((filtered-args (true-map (lambda (x) 
-                    (let ((type2 (type-tag x))) 
-                                              (if (eq? type1 type2) 
-                                                  x 
-                                                  (let ((t2->t1 (get-coercion type2 type1))) 
-                                                    (if (null? t2->t1) #f (t2->t1 x)))))) 
-                                          args))) 
-             (or filtered-args 
-                 (iter (cdr type-tags) args)))))) 
-   (let ((type-tags (map type-tag args))) 
-     (let ((proc (get op type-tags))) 
-       (if (not (null? proc)) 
-           (apply proc (map contents args)) 
-           (apply apply-generic (cons op (iter type-tags args))))))) 
-  
- ;;; true-map function applies proc to each item on the sequence and returns false if any of  
- ;;;;those results was false otherwise returns the list of each results.  
- (define (true-map proc sequence) 
-   (define (true-map-iter proc sequence result) 
-     (if (null? sequence) 
-         (reverse result) 
-         (let ((item (proc (car sequence)))) 
-           (if item 
-               (true-map-iter proc (cdr sequence) (cons item result)) 
-               #f)))) 
- (true-map-iter proc sequence '())) 
+(define (apply-generic op . args)
+  (define (can-coerce-into? types target-type)
+    "Can all _types_ be coerced into _target-type_ ?" 
+    (andmap 
+      (lambda (type)
+        (or
+          (equal? type target-type)
+          (get-coercion type target-type)))
+      types))
+  (define (find-coercion-target types)
+    "Find a type among _types_ that all _types_ can be
+    coerced into." 
+    (ormap
+      (lambda (target-type)
+        (if (can-coerce-into? types target-type)
+          target-type
+          #f))
+      types))
+  (define (coerce-all args target-type)
+    "Coerce all _args_ to _target-type_" 
+    (map 
+      (lambda (arg)
+        (let ((arg-type (type-tag arg)))
+          (if (equal? arg-type target-type)
+            arg
+            ((get-coercion arg-type target-type) arg))))
+      args))
+  (define (no-method type-tags)
+    (error "No method for these types" 
+      (list op type-tags)))      
+  (let ((type-tags (map type-tag args)))
+    (let ((proc (get op type-tags)))
+      (if proc
+        (apply proc (map contents args))
+        (let ((target-type (find-coercion-target type-tags)))
+          (if target-type
+            (apply
+              apply-generic
+              (append 
+                (list op)
+                (coerce-all args target-type)))
+            (no-method type-tags)))))))  
 
 (define (add x y) (apply-generic 'add x y))
 (define (sub x y) (apply-generic 'sub x y))
@@ -170,15 +231,15 @@
 (define r2 (make-rational 75 100))
 (define r3 (make-rational 2 3))
 
-(displayln "should be true")
+;(displayln "should be true")
 (apply-generic 'equ? r1 r2)
-(displayln "should be false")
+;(displayln "should be false")
 (apply-generic 'equ? r1 r3)
 
 (define r4 (make-rational 0 5))
-(display "=zero? r4 should be true: ")
+;(display "=zero? r4 should be true: ")
 (apply-generic '=zero? r4)
-(display "=zero? r3 should be false: ")
+;(display "=zero? r3 should be false: ")
 (apply-generic '=zero? r3)
 
 (define (install-real-package)
@@ -312,9 +373,9 @@ rt1
 (define p2 (make-from-mag-ang 5 3))
 (define p3 (make-from-mag-ang 5 4))
 
-(displayln "Should be true")
+;(displayln "Should be true")
 (apply-generic 'equ? p1 p2)
-(displayln "Should be false")
+;(displayln "Should be false")
 (apply-generic 'equ? p1 p3)
 
 (define (real-part c)
@@ -424,8 +485,8 @@ rt1
    (make-complex-from-real-imag (contents n) 0)) 
  (define (scheme-number->rational n) 
    (make-rational (contents n) 1)) 
- (put-coercion 'scheme-number 'rational scheme-number->rational) 
- (put-coercion 'scheme-number 'complex scheme-number->complex) 
+ (put 'scheme-number 'rational scheme-number->rational) 
+ (put 'scheme-number 'complex scheme-number->complex) 
  'done) 
   
  (install-coercion-package) 
@@ -434,7 +495,7 @@ rt1
   
  ;;RESULT 
  ;; 1 ]=>
-(apply-generic 'add (make-scheme-number 1) (make-scheme-number 4)(make-scheme-number 5)) 
+(apply-generic 'add (make-scheme-number 1) (make-scheme-number 4)) 
   
  ;; ;Value: 5 
   
