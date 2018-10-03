@@ -1,0 +1,33 @@
+#lang sicp
+
+(define (make-queue)
+  (let ((front-ptr '())
+        (rear-ptr '()))
+    (define print
+      (begin
+        (display front-ptr)
+        (newline)))
+    (define empty?
+      (null? front-ptr))
+    (define (insert item)
+      (let ((new-pair (cons item '())))
+        (cond (empty?
+               (set! front-ptr new-pair)
+               (set! rear-ptr new-pair))
+              (else (set-cdr! rear-ptr new-pair)
+                    (set! rear-ptr new-pair)))))            
+    (define (dispatch m)
+      (cond ((eq? m 'print) print)
+            ((eq? m 'empty?) empty?)
+            ((eq? m 'insert) insert)
+            (else (error "make-queue: undefined operation" m))))
+    dispatch))
+
+(define (print-queue q) (q 'print))
+(define (empty-queue? q) (q 'empty?))
+(define (insert-queue q i) ((q 'insert) i))
+
+(define q1 (make-queue))
+(print-queue q1)
+(empty-queue? q1)
+(print-queue q1)
