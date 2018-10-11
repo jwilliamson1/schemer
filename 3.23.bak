@@ -2,6 +2,7 @@
 
 (define (front-ptr queue) (car queue))
 (define (rear-ptr queue) (cdr queue))
+
 (define (set-front-ptr! queue item) 
   (set-car! queue item))
 (define (set-rear-ptr! queue item) 
@@ -17,21 +18,62 @@
       (error "FRONT called with an empty queue" queue)
       (car (front-ptr queue))))
 
-(define (insert-queue! queue item)
-  (let ((new-pair (cons item '())))
-    (cond ((empty-queue? queue)
-           (set-front-ptr! queue new-pair)
-           (set-rear-ptr! queue new-pair)
-           queue)
-          (else
-           ;sets the pointer of the last pair to the new pair
-           (set-cdr! (rear-ptr queue)
-                          new-pair)
-           ;sets the rear pointer
-                (set-rear-ptr! queue new-pair)
-                queue))))
+(define (print-queue queue)
+  (begin (display (front-ptr queue))
+         (newline)))
 
-(define (delete-queue! queue)
+(define (rear-queue queue)
+  (if (empty-queue? queue)
+      (error "REAR called with an empty queue" queue)
+      (car (rear-ptr queue))))     
+
+(define (make-node item next prev)
+  (list (cons 'item item)
+        (cons 'next next)
+        (cons 'prev prev)))
+
+(define q0 (make-node 'ground-zero '() '()))
+(define qn1 (make-node 'my-thing '() '()))
+(define q2 (make-node 'another-thing '() '()))
+
+(define (queue-node-item queue)(cdr (car queue)))
+(define (queue-node-next queue)(cdr (cadr queue)))
+(define (queue-node-prev queue)(cdr (caddr queue)))
+
+(define (set-next-node! node item)(set-cdr! (cadr node) item))
+(define (set-prev-node! node item)(set-cdr! (caddr node) item))
+
+(set-prev-node! q0 qn1)
+q0
+(set-next-node! q0 q2)
+q0
+;(queue-node-item qn1)
+;(queue-node-next qn1)
+;(queue-node-prev qn1)
+
+(define (insert-rear! queue item)
+  (let ((new-node (make-node item (rear-ptr queue) '())))
+    (cond ((empty-queue? queue)
+           (set-front-ptr! queue new-node)
+           (set-rear-ptr! queue new-node)
+           (print-queue queue))
+          (else
+           ;sets the pointer of the next node to the new node
+           (set-next-node! (rear-ptr queue) new-node)     
+           ;sets the rear pointer
+           (set-rear-ptr! queue new-node)
+           (print-queue queue)))))
+
+(define (insert-front! queue item)
+  (cond ((empty-queue? queue)
+         (let ((new-pair (cons item '())))
+           (set-front-ptr! queue new-pair)
+           (set-rear-ptr! queue new-pair)))
+        (else
+         (let ((new-front (cons item (front-ptr queue))))
+           (set-front-ptr! queue new-front)))))
+
+(define (delete-front! queue)
   (cond ((empty-queue? queue)
          (error "DELETE! called with an empty queue"))
         (else (set-front-ptr!
@@ -39,14 +81,26 @@
                (cdr (front-ptr queue)))
               queue)))
 
-(define (print-queue queue)
-  (begin (display (front-ptr queue))
-         (newline)))
+(define (delete-rear! queue)
+  (cond ((empty-queue? queue)
+         (error "DELETE! called with an empty queue"))
+        (else (set-rear-ptr!
+               queue
+               ))))
 
-(define A (make-queue))
-(insert-queue! A 'a)
-(insert-queue! A 'b)
-(print-queue A)
-(print-queue (delete-queue! A))
-(print-queue (delete-queue! A))
-(print-queue (delete-queue! A))
+
+(define q1 (make-queue))
+;q1
+;(rear-ptr q1)
+;(rear-queue q1) error
+(insert-rear! q1 'a)
+;(insert-rear! q1 'b)
+;q1
+;(rear-queue q1)
+(insert-rear! q1 'b)
+q1
+;(insert-front! q1 'c)
+;(rear-queue q1)
+;(print-queue q1)
+;(print-queue (delete-front! q1))
+;(rear-queue q1)
