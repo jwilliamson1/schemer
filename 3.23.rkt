@@ -1,5 +1,5 @@
 #lang sicp
-
+;these are actually dequeues but i got lazy
 (define (front-ptr queue) (car queue))
 (define (rear-ptr queue) (cdr queue))
 
@@ -36,17 +36,17 @@
 (define qn1 (make-node 'my-thing '() '()))
 (define q2 (make-node 'another-thing '() '()))
 
-(define (queue-node-item queue)(cdr (car queue)))
-(define (queue-node-next queue)(cdr (cadr queue)))
-(define (queue-node-prev queue)(cdr (caddr queue)))
+(define (node-item queue)(cdr (car queue)))
+(define (next-node queue)(cdr (cadr queue)))
+(define (prev-node queue)(cdr (caddr queue)))
 
 (define (set-next-node! node item)(set-cdr! (cadr node) item))
 (define (set-prev-node! node item)(set-cdr! (caddr node) item))
 
-(set-prev-node! q0 qn1)
-q0
-(set-next-node! q0 q2)
-q0
+;(set-prev-node! q0 qn1)
+;q0
+;(set-next-node! q0 q2)
+;q0
 ;(queue-node-item qn1)
 ;(queue-node-next qn1)
 ;(queue-node-prev qn1)
@@ -78,15 +78,16 @@ q0
   (cond ((empty-queue? queue)
          (error "DELETE! called with an empty queue"))
         (else (set-front-ptr! queue
-                              (queue-node-next (front-ptr queue)))
+                              (next-node (front-ptr queue)))
               (set-prev-node! (front-ptr queue) '())
-              queue)))
+              (print-queue queue))))
 
 (define (delete-rear! queue)
   (cond ((empty-queue? queue)
          (error "DELETE! called with an empty queue"))
-        (else (set-rear-ptr! queue (queue-node-prev (rear-ptr queue)))
+        (else (set-rear-ptr! queue (prev-node (rear-ptr queue)))
               (set-next-node! (rear-ptr queue) '())
+              (print-queue queue)
                )))
 
 
@@ -95,19 +96,23 @@ q0
 ;(rear-ptr q1)
 ;(rear-queue q1) error
 (insert-rear! q1 'a)
+
 ;(insert-rear! q1 'b)
 ;q1
 ;(rear-queue q1)
 (insert-rear! q1 'b)
+(rear-ptr q1)
 (insert-rear! q1 'c)
 (insert-front! q1 'z)
 (delete-front! q1)
 (delete-rear! q1)
-q1
 ;(insert-front! q1 'c)
-(front-queue q1)
-(rear-queue q1)
-
+(rear-ptr q1)
+;(delete-rear! q1)
+(set-next-node! (rear-ptr q1) (front-ptr q1))
+(print-queue q1)
+(next-node (next-node (next-node (next-node(next-node (next-node (next-node (next-node (front-ptr q1)))))))))
+;(insert-rear! q1 (front-ptr q1))
 ;(print-queue q1)
 ;(print-queue (delete-front! q1))
 ;(rear-queue q1)
