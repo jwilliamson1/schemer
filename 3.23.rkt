@@ -1,31 +1,27 @@
 #lang sicp
-;these are actually dequeues but i got lazy
-(define (front-ptr queue) (car queue))
-(define (rear-ptr queue) (cdr queue))
+;these are actually deques but i got lazy
+(define (front-ptr deque) (car deque))
+(define (rear-ptr deque) (cdr deque))
 
-(define (set-front-ptr! queue item) 
-  (set-car! queue item))
-(define (set-rear-ptr! queue item) 
-  (set-cdr! queue item))
+(define (set-front-ptr! deque item) 
+  (set-car! deque item))
+(define (set-rear-ptr! deque item) 
+  (set-cdr! deque item))
 
-(define (empty-queue? queue)
-  (null? (front-ptr queue)))
+(define (empty-deque? deque)
+  (null? (front-ptr deque)))
 
-(define (make-queue) (cons '() '()))
+(define (make-deque) (cons '() '()))
 
-(define (front-queue queue)
-  (if (empty-queue? queue)
-      (error "FRONT called with an empty queue" queue)
-      (car (front-ptr queue))))
+(define (front-deque deque)
+  (if (empty-deque? deque)
+      (error "FRONT called with an empty deque" deque)
+      (car (front-ptr deque))))
 
-(define (print-queue queue)
-  (begin (display (front-ptr queue))
-         (newline)))
-
-(define (rear-queue queue)
-  (if (empty-queue? queue)
-      (error "REAR called with an empty queue" queue)
-      (car (rear-ptr queue))))     
+(define (rear-deque deque)
+  (if (empty-deque? deque)
+      (error "REAR called with an empty deque" deque)
+      (car (rear-ptr deque))))     
 
 (define (make-node item prev next)
   (list (cons 'item item)
@@ -36,9 +32,9 @@
 (define qn1 (make-node 'my-thing '() '()))
 (define q2 (make-node 'another-thing '() '()))
 
-(define (node-item queue)(cdr (car queue)))
-(define (next-node queue)(cdr (cadr queue)))
-(define (prev-node queue)(cdr (caddr queue)))
+(define (node-item deque)(cdr (car deque)))
+(define (next-node deque)(cdr (cadr deque)))
+(define (prev-node deque)(cdr (caddr deque)))
 
 (define (set-next-node! node item)(set-cdr! (cadr node) item))
 (define (set-prev-node! node item)(set-cdr! (caddr node) item))
@@ -47,72 +43,83 @@
 ;q0
 ;(set-next-node! q0 q2)
 ;q0
-;(queue-node-item qn1)
-;(queue-node-next qn1)
-;(queue-node-prev qn1)
+;(deque-node-item qn1)
+;(deque-node-next qn1)
+;(deque-node-prev qn1)
 
-(define (insert-rear! queue item)
-  (let ((new-node (make-node item (rear-ptr queue) '())))
-    (cond ((empty-queue? queue)
-           (set-front-ptr! queue new-node)
-           (set-rear-ptr! queue new-node)
-           (print-queue queue))
+(define (insert-rear! deque item)
+  (let ((new-node (make-node item (rear-ptr deque) '())))
+    (cond ((empty-deque? deque)
+           (set-front-ptr! deque new-node)
+           (set-rear-ptr! deque new-node)
+           (print-deque deque))
           (else
            ;sets the pointer of the next node to the new node
-           (set-next-node! (rear-ptr queue) new-node)     
+           (set-next-node! (rear-ptr deque) new-node)     
            ;sets the rear pointer
-           (set-rear-ptr! queue new-node)
-           (print-queue queue)))))
+           (set-rear-ptr! deque new-node)
+           (print-deque deque)))))
 
-(define (insert-front! queue item)
-  (let ((new-node (make-node item '() (front-ptr queue))))
-  (cond ((empty-queue? queue)
-           (set-front-ptr! queue new-node)
-           (set-rear-ptr! queue new-node))
+(define (insert-front! deque item)
+  (let ((new-node (make-node item '() (front-ptr deque))))
+  (cond ((empty-deque? deque)
+           (set-front-ptr! deque new-node)
+           (set-rear-ptr! deque new-node))
         (else
-         (set-prev-node! (front-ptr queue) new-node)
-         (set-front-ptr! queue new-node)
-         (print-queue queue)))))
+         (set-prev-node! (front-ptr deque) new-node)
+         (set-front-ptr! deque new-node)
+         (print-deque deque)))))
 
-(define (delete-front! queue)
-  (cond ((empty-queue? queue)
-         (error "DELETE! called with an empty queue"))
-        (else (set-front-ptr! queue
-                              (next-node (front-ptr queue)))
-              (set-prev-node! (front-ptr queue) '())
-              (print-queue queue))))
+(define (delete-front! deque)
+  (cond ((empty-deque? deque)
+         (error "DELETE! called with an empty deque"))
+        (else (set-front-ptr! deque
+                              (next-node (front-ptr deque)))
+              (set-prev-node! (front-ptr deque) '())
+              (print-deque deque))))
 
-(define (delete-rear! queue)
-  (cond ((empty-queue? queue)
-         (error "DELETE! called with an empty queue"))
-        (else (set-rear-ptr! queue (prev-node (rear-ptr queue)))
-              (set-next-node! (rear-ptr queue) '())
-              (print-queue queue)
+(define (delete-rear! deque)
+  (cond ((empty-deque? deque)
+         (error "DELETE! called with an empty deque"))
+        (else (set-rear-ptr! deque (prev-node (rear-ptr deque)))
+              (set-next-node! (rear-ptr deque) '())
+              (print-deque deque)
                )))
 
+(define (print-deque deque)
+  (define (skip-node node)
+    (next-node (next-node node))) 
+  
+  (define (iter node next result)
+    (cond ((null? next) (list "next is null: " (reverse (cons (node-item node) result))))
+          ((eq? (next-node node) (next-node next)) (list " ***STOPPING: CYCLE DETECTED***: " (reverse (cons (node-item node) result))))
+          ((null? (next-node next)) (reverse (cons (node-item (next-node node)) result)))
+          (else 
+           (iter (next-node node) (skip-node next) (cons (node-item node) result)))))
+  
+  (let ((first-node (front-ptr deque)))
+    (display (iter first-node (next-node first-node) '()))
+    (newline)))
 
-(define q1 (make-queue))
+
+
+(define q1 (make-deque))
 ;q1
 ;(rear-ptr q1)
-;(rear-queue q1) error
+;(rear-deque q1) error
 (insert-rear! q1 'a)
-
-;(insert-rear! q1 'b)
-;q1
-;(rear-queue q1)
 (insert-rear! q1 'b)
-(rear-ptr q1)
 (insert-rear! q1 'c)
-(insert-front! q1 'z)
-(delete-front! q1)
-(delete-rear! q1)
-;(insert-front! q1 'c)
 (rear-ptr q1)
 ;(delete-rear! q1)
 (set-next-node! (rear-ptr q1) (front-ptr q1))
-(print-queue q1)
-(next-node (next-node (next-node (next-node(next-node (next-node (next-node (next-node (front-ptr q1)))))))))
+(insert-front! q1 'z)
+
+(print-deque q1)
+(newline)
+(node-item (next-node (next-node (next-node(next-node (next-node (next-node (next-node (front-ptr q1)))))))))
+(node-item (next-node (next-node (next-node (next-node(next-node (next-node (next-node (next-node (front-ptr q1))))))))))
 ;(insert-rear! q1 (front-ptr q1))
-;(print-queue q1)
-;(print-queue (delete-front! q1))
-;(rear-queue q1)
+;(print-deque q1)
+;(print-deque (delete-front! q1))
+;(rear-deque q1)
