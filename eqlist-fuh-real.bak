@@ -1,0 +1,42 @@
+#lang racket
+
+(define (atom? x)
+  (and (not (null? x))
+       (not (pair? x))))
+
+(define (eqan? x1 x2)
+  (cond ((and (number? x1)(number? x2))
+         (= x1 x2))
+        ((or (number? x1)(number? x2))#f)
+        (else (eq? x1 x2))))
+
+(define eqlist?
+(lambda ( l1 l2)
+(cond
+((and ( null? l1 ) ( null? l2)) #t)
+((and (null? l1 ) ( atom? (car l2)))
+#f)
+((null? l1) #f)
+((and ( atom? ( car l1)) (null? l2))
+#f)
+((and ( atom? ( car l1 ))
+( atom? ( car l2)))
+(and ( eqan? ( car l1 ) (car l2))
+( eqlist? ( cdr l1 ) ( cdr l2))))
+(( atom? ( car l1)) #f)
+((null? l2) #f)
+(( atom? ( car l2)) #f)
+(else
+(and ( eqlist? ( car l1 ) ( car l2))
+( eqlist? ( cdr l1 ) ( cdr l2))))))) 
+
+(display "should be #t")(eqlist? '(((test)) test) '(((test)) test))
+(display "should be #t")(eqlist? '() '())
+(display "should be #f")(eqlist? '(a) '())
+(display "should be #f")(eqlist? '() '(a))
+(display "should be #f")(eqlist? '(a v) '())
+(display "should be #f")(eqlist? '() '(a v))
+(display "should be #t")(eqlist? '(a b) '(a b))
+(display "should be #t")(eqlist? '(strawberry ice cream) '(strawberry ice cream))
+(display "should be #f")(eqlist? '((test) test2) '(test test2))
+(display "should be #f")(eqlist? '(test test2) '((test) test2))
