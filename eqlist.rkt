@@ -1,0 +1,77 @@
+#lang sicp
+
+(define (atom? x)
+  (and (not (null? x))
+       (not (pair? x))))
+
+
+;(atom? 'a)
+;(atom? 1)
+;(atom? '())
+;(atom? '(1))
+;(atom? '(1 2))
+
+(define eqan?
+(lambda ( a1 a2)
+(cond
+((and (number? a1) (number? a2))
+(= a1 a2))
+((or (number? a1) (number? a2))
+#f)
+(else ( eq? a1 a2)))))
+(display "equan? ")
+(eqan? 1 '1)
+
+(define (eqlist l1 l2)
+  (cond
+    ((and (null? l1)(atom? l2)) #f)
+    ((and (atom? l1)(null? l2)) #f)
+    ((and (pair? l1)(atom? l2)) #f)
+    ((and (atom? l1)(pair? l2)) #f)
+    ((and (null? l1)(pair? l2)) #f)
+    ((and (pair? l1)(pair? l2))
+     (and (eqlist (car l1) (car l2))
+          (eqlist (cdr l1) (cdr l2))))
+    (else (eq? l1 l2))))
+
+(eqlist '(((test)) test) '(((test)) test)) (display "should be #t")
+(eqlist '() 'a) (display "should be #f")
+(eqlist '() '()) (display "should be #t")
+(eqlist '(a) '()) (display "should be #f")
+(eqlist 'a 'b) (display "should be #f")
+(eqlist 'a '(a)) (display "should be #f")
+(eqlist 'a '())(display "should be #f")
+(eqlist 'a 'a)(display "should be #t")
+(eqlist '(a v) '())(display "should be #f")
+(eqlist '(a b) '(a b))(display "should be #t")
+(eqlist '(strawberry ice cream) '(strawberry ice cream))(display "should be #t")
+(eqlist '1 1)(display "should be #t")
+
+(define (equlist? l1 l2)
+  (cond ((and (null? l1)(atom? l2)) #f)
+        ((and (null? l1)(null? l2)) #t)
+        ((null? l2) #f) ;we know if anything is null it's bad since we checked both
+        ((and (atom? l1)(atom? l2)) ;no need to check atom l1 null l2
+         (eqan? l1 l2))
+        ((and (atom? l1)(atom? (car l2))) #f)
+        ((atom? l2) #f) ;we know both aren't atoms so only other thing is l1's car is  list              
+        ((and (atom? (car l1))(atom? (car l2)))(equlist? (cdr l1)(cdr l2)))
+        (else (and (equlist? (car l1)(car l2))(equlist? (cdr l1)(cdr l2))))
+))
+(newline)
+(display "equlist?")
+(newline)
+(display "should be #t")(equlist? '(((test)) test) '(((test)) test))
+(display "should be #f")(equlist? '() 'a)
+(display "should be #t")(equlist? '() '())
+(display "should be #f")(equlist? '(a) '())
+(display "should be #f")(equlist? 'a 'b)
+(display "should be #f")(equlist? 'a '(a))
+(display "should be #f")(equlist? 'a '())
+(display "should be #t")(equlist? 'a 'a)
+(display "should be #f")(equlist? '(a v) '())
+(display "should be #t")(equlist? '(a b) '(a b))
+(display "should be #t")(equlist? '(strawberry ice cream) '(strawberry ice cream))
+(display "should be #t")(equlist? '1 1)
+(display "should be #f")(equlist? '((test) test2) '(test test2))
+(display "should be #f")(equlist? '(test test2) '((test) test2))

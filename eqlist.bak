@@ -1,0 +1,7 @@
+#lang sicp
+
+(define (eqlist l1 l2)
+  (cond
+    ((and (null? l1)(atom? l2)))
+    (else  
+     
