@@ -8,6 +8,7 @@
   (set-cdr! (last-pair x) x)
   x)
 
+(define e (make-cycle (list 'a)))
 (define z (make-cycle (list 'a 'b 'c)))
 (define u (make-cycle (list 'a 'b 'c 'd 'e 'f)))
 (define w (make-cycle (list 'a 'b 'c 'd 'e 'f 'g)))
@@ -30,6 +31,7 @@
   (and (pair? xs)
       (chase xs (cdr xs))))
 
+(contains-cycle? e)
 (contains-cycle? z)
 (contains-cycle? v)
 (contains-cycle? x)
@@ -41,3 +43,4 @@
 (contains-cycle? b)
 (contains-cycle? c)
 (contains-cycle? d)
+(display e)
