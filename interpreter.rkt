@@ -144,6 +144,10 @@ e4
 
 (define body-of third)
 
+(define question-of first)
+
+(define answer-of second)
+
 (define evcon
   (lambda (lines table)
     (cond
@@ -162,7 +166,9 @@ e4
       ((atom? question)(eq? question (quote else)))
       (else #f))))
 
-(define question-of first)
+(define cond-lines-of cdr) 
 
-(define question-of second)
+(define *cond
+  (lambda (e table)
+    (evcon (cond-lines-of e) table)))
 
