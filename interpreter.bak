@@ -144,12 +144,6 @@ e4
 
 (define body-of third)
 
-(define *cond
-  (lambda (e table)
-    (evcon (cond-lines-of e) table)))
-
-(define cond-lines-of cdr)
-
 (define evcon
   (lambda (lines table)
     (cond
@@ -170,27 +164,5 @@ e4
 
 (define question-of first)
 
-(define answer-of second)
+(define question-of second)
 
-(define evlis
-  (lambda ( args table)
-    (cond
-      (( null? args) (quote ()))
-      (else
-       (cons (meaning (car args) table)
-              (evlis (cdr args) table))))))
-
-(define function-of
-  (lambda (e)(car e)))
-
-(define arguments-of
-  (lambda (e)(cdr e)))
-
-(define *application
-  (lambda (e table)
-    (apply
-     (meaning (function-of e) table))
-     (evlis (arguments-of e) table)))
-
-(define primitive (lambda (f)(eq? (first f) 'primitive)))
-(define non-primitive (lambda (f) (eq? (first f) 'non-primitive)))
