@@ -205,6 +205,7 @@ e4
        (apply-closure
         (second func) vals)))))
 
+
 (define apply-primitive
   (lambda (name vals)
     (cond
@@ -215,14 +216,14 @@ e4
       ((eq? name (quote cdr))
        (cdr (first vals)))
       ((eq? name (quote null?))
-        (null? (first vals)))
+       (null? (first vals)))
       ((eq? name (quote eq?))
        (eq? (first vals)(second vals )))
       ((eq? name (quote atom?))
        (:atom? (first vals)))
       ((eq? name (quote zero?))
-       (zero ? (first vals)))
-      ((eq? name (quote add 1))
+       (zero? (first vals)))
+      ((eq? name (quote add1))
        (add1 (first vals)))
       ((eq? name (quote sub1))
        (sub1 (first vals)))
@@ -233,18 +234,19 @@ e4
   (lambda (x)
     (cond
       ((atom? x) #t)
-      ((null ? x) #f)
-      ((eq? (car x ) (quote primitive))
-       #t)
-      ((eq? (car x ) (quote non-primitive))
-       #t)
-      (else #f ))))
+      ((null? x) #f)
+      ((eq? (car x) (quote primitive))#t)
+      ((eq? (car x) (quote non-primitive))#t)
+      (else #f))))
 
 (define apply-closure
-  (lambda ( closure vals)
-    (meaning ( body-of closure)
-             ( extend-table
-               (new-entry
-                (formals-of closure)
-                vals)
-               ( table-of closure)))))
+  (lambda (closure vals)
+    (meaning (body-of closure)
+             (extend-table
+              (new-entry
+               (formals-of closure)
+               vals)
+              (table-of closure)))))
+
+(apply '(primitive cons) '(a b))
+(apply '(non-primitive (lambda (x y)(* x y))) '(5 4)) 

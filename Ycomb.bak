@@ -1,0 +1,17 @@
+#lang racket
+
+(define (make-len func)
+    (lambda (n)
+      (if (= 1 n) 1
+          (* n (func (- n 1))))))
+
+(define (eternity x)
+    (display "eternity"))
+
+((make-len make-len) 2)
+
+(define (fact n)
+  (if (= 1 n) 1
+      (* n (fact (- n 1)))))
+
+(fact 5)
