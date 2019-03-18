@@ -1,0 +1,9 @@
+[Math, +, Int]
+if key is not null then create new record with that key as head ('*table*, ('Math, ...
+if key is not null then create new record with that key as head ('Math, '+, ...
+if cdr is not null then create new record with that key as head 
+('*table* (('Math (('+ ('Int 43))('/ ('Real 45)))('Letters (('a ('utf-8 97))('b ('utf-16 34))))
+
+if cddr is not null then (cons(car on rec (('Math
+if cddr is not null then (cons(car on rec (('Math (('+ 
+if cddr is null then ret (cons (car val) (('Math (('+ (('Int 
