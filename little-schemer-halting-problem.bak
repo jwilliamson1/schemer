@@ -19,5 +19,4 @@
       ((eq? (pick pos lat) a) #t)
       (else (looking a pos lat)))))
 
-(looking  'caviar 1 '(6 2 4 caviar 5 7 3))
-;(looking  'caviar 1 '(7 1 2 caviar 5 6 3))
+(looking  'caviar 1 '(6 2 3 caviar 5 7 3))
