@@ -5,9 +5,9 @@
 (define (make-tree entry left right)
   (list entry left right))
 
-(define test-tree-lbranch (make-tree 3 '() '()))
-(define test-tree-rbranch (make-tree 7 '() '()))
-(define test-tree-root(make-tree 5 test-tree-lbranch test-tree-rbranch))
+(define test-tree-lbranch (make-tree (cons 3 'three) '() '()))
+(define test-tree-rbranch (make-tree (cons 7 'seven) '() '()))
+(define test-tree-root(make-tree (cons 4 'four) test-tree-lbranch test-tree-rbranch))
 (entry test-tree-root)
 (left-branch test-tree-root)
 (right-branch test-tree-root)
@@ -24,8 +24,8 @@
           x 
           (right-branch set)))))
 
-(element-of-set? 3 test-tree-root)
-(element-of-set? 4 test-tree-root)
+;(element-of-set? 3 test-tree-root)
+;element-of-set? 4 test-tree-root)
 
 
 
@@ -37,14 +37,16 @@
 
 (define (assoc key records)
   (cond ((null? records) false)
-        ((equal? key (car (entry records))) 
+        ((equal? key (caar records))
          (car records))
-        ((< key (car(entry records)))
+        ((< key (caar records))
          (assoc key (left-branch records)))        
         (else (assoc key (right-branch records)))))
 
+test-tree-root
 (assoc 3 test-tree-root)
-(assoc 4 test-tree-root)
+(assoc 7 test-tree-root)
+(assoc -4 test-tree-root)
 
 (define (insert! key value table)
   (let ((record (assoc key (cdr table))))
@@ -73,20 +75,20 @@
          (make-tree
           (entry set)
           (left-branch set)
-          (adjoin-set x (right-branch set)))))))
+          (adjoin-set x (right-branch set))))))))
 
 (define (insert-tree! key value table)
-  (let ((record (assoc key (cdr table))))
+  (let ((record (assoc key table)))
     (if record
         (set-cdr! record value)
-        (set-cdr! table (adjoin-set (cons key value) (cdr table)))))
+        (set! table (adjoin-set (cons key value) table))))
   'ok)
 
-(define t1 (cons '*table* (cons '() '())))
+(define t1 '())
 t1
 (insert-tree! 42 'mom t1)
-(entry (cdr t1))
-(insert-tree! 40 'dad t1)
+;(entry (cdr t1))
+;(insert-tree! 40 'dad t1)
 ;(set! t1 (make-tree (make-record 'please 'work) '() '()))
 ;t1
 
