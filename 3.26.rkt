@@ -1,9 +1,10 @@
 #lang sicp
-(define (entry tree) (car tree))
+(define (entry tree) (caar tree))
 (define (left-branch tree) (cadr tree))
 (define (right-branch tree) (caddr tree))
 (define (make-tree entry left right)
   (list entry left right))
+(define (make-tree-node x) (make-tree x '() '()))
 
 (define test-tree-lbranch (make-tree (cons 3 'three) '() '()))
 (define test-tree-rbranch (make-tree (cons 7 'seven) '() '()))
@@ -36,7 +37,7 @@
         false)))
 
 (define (assoc key records)
-  (cond ((null? records) false)
+  (cond ((or (null? records) (null? (car records))) false)
         ((equal? key (caar records))
          (car records))
         ((< key (caar records))
@@ -64,31 +65,31 @@ test-tree-root
   (display (list "add-new-entry!" empty-node key value))
   (set-cdr! empty-node (make-tree (make-record key value) '() '())))
 
+(define (set-left-branch! tree entry) (set-car! (cdr tree) entry))
+(define (set-right-branch! tree entry) (set-cdr! (cddr tree) entry)) 
+
 (define (adjoin-set x set)
-  (let ((new-key (car x))
-        (set-key (car (entry set))))
-  (cond ((null? set) (make-tree x '() '()))
-        ((eq? new-key set-key x)
-        ((< x (entry set))
-         )
-        ((> x (entry set))
-         (make-tree
-          (entry set)
-          (left-branch set)
-          (adjoin-set x (right-branch set))))))))
+  (let ((new-key (car x)))
+    (cond ((null? set) (make-tree-node x))
+          ((eq? new-key (caar set)) (car set))
+          ((< new-key (entry set))
+           (set-left-branch! set (adjoin-set x (left-branch set))))
+          ((> new-key (entry set))
+           (set-right-branch! set (adjoin-set x (right-branch set)))))))
 
 (define (insert-tree! key value table)
-  (let ((record (assoc key table)))
+  (let ((record (assoc key (cdr table))))
     (if record
         (set-cdr! record value)
-        (set! table (adjoin-set (cons key value) table))))
+        (begin
+          (set-cdr! table (make-tree (cons key value) '() '()))
+          (display table))))
   'ok)
 
-(define t1 '())
+(define t1 (list '*table*))
 t1
 (insert-tree! 42 'mom t1)
-;(entry (cdr t1))
-;(insert-tree! 40 'dad t1)
-;(set! t1 (make-tree (make-record 'please 'work) '() '()))
-;t1
+t1
 
+(insert-tree! 42 'dad t1)
+(define d1 (cdr t1))
