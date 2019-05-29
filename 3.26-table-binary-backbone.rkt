@@ -203,3 +203,8 @@ t1
 (getm (list 'a))
 (putm (list 'math 'ints) '4)
 (getm (list 'math 'ints))
+
+(define sample-table (cons '*table* (cons (cons 'a 1) (cons (cons 'b 2) (cons (cons 'c 3) '())))))
+sample-table
+
+(map (lambda (x)(cons x x)) sample-table )

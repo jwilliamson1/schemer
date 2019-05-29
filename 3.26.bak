@@ -1,0 +1,13 @@
+#lang sicp
+(define (entry tree) (car tree))
+(define (left-branch tree) (cadr tree))
+(define (right-branch tree) (caddr tree))
+(define (make-tree entry left right)
+  (list entry left right))
+
+(define test-tree-lbranch (make-tree 3 '() '()))
+(define test-tree-rbranch (make-tree 7 '() '()))
+(define test-tree-root(make-tree 5 test-tree-lbranch test-tree-rbranch))
+(entry test-tree-root)
+(left-branch test-tree-root)
+(right-branch test-tree-root)
