@@ -1,4 +1,5 @@
 #lang sicp
+(define (make-entry key value) (cons key value))
 (define (entry tree) (caar tree))
 (define (left-branch tree) (cadr tree))
 (define (right-branch tree) (caddr tree))
@@ -68,26 +69,27 @@ test-tree-root
 (define (set-left-branch! tree entry) (set-car! (cdr tree) entry))
 (define (set-right-branch! tree entry) (set-cdr! (cddr tree) entry)) 
 
-(define (adjoin-set x set)
+(define (adjoin-set! x set)
   (let ((new-key (car x)))
     (cond ((null? set) (make-tree-node x))
-          ((eq? new-key (caar set)) (car set))
+          ;((eq? new-key (caar set)) (car set))
           ((< new-key (entry set))
-           (set-left-branch! set (adjoin-set x (left-branch set))))
+           (set-left-branch! set (adjoin-set! x (left-branch set))))
           ((> new-key (entry set))
-           (set-right-branch! set (adjoin-set x (right-branch set)))))))
+           (set-right-branch! set (adjoin-set! x (right-branch set)))))))
 
 (define (insert-tree! key value table)
   (let ((record (assoc key (cdr table))))
     (if record
         (set-cdr! record value)
         (begin
-          (set-cdr! table (make-tree (cons key value) '() '()))
+          (adjoin-set! (make-entry key value) (cdr table))
           (display table))))
   'ok)
 
 (define t1 (list '*table*))
 t1
+(set-cdr! t1 (make-tree-node (make-entry 42 'wet)))
 (insert-tree! 42 'mom t1)
 t1
 
