@@ -1,5 +1,5 @@
 #lang sicp
-(define (make-entry key value) (cons key value))
+ (define (make-entry key value) (cons key value))
 (define (entry tree) (caar tree))
 (define (left-branch tree) (cadr tree))
 (define (right-branch tree) (caddr tree))
@@ -67,31 +67,42 @@ test-tree-root
   (set-cdr! empty-node (make-tree (make-record key value) '() '())))
 
 (define (set-left-branch! tree entry) (set-car! (cdr tree) entry))
-(define (set-right-branch! tree entry) (set-cdr! (cddr tree) entry)) 
+(define (set-right-branch! tree entry) (set-car! (cddr tree) entry)) 
 
 (define (adjoin-set! x set)
   (let ((new-key (car x)))
     (cond ((null? set) (make-tree-node x))
-          ;((eq? new-key (caar set)) (car set))
+          ((eq? new-key (caar set))
+           (set-cdr! (car set) (cdr x))
+           set)
           ((< new-key (entry set))
-           (set-left-branch! set (adjoin-set! x (left-branch set))))
+           (set-left-branch! set (adjoin-set! x (left-branch set)))
+           set)
           ((> new-key (entry set))
-           (set-right-branch! set (adjoin-set! x (right-branch set)))))))
+           (set-right-branch! set (adjoin-set! x (right-branch set)))
+           set))))
 
-(define (insert-tree! key value table)
-  (let ((record (assoc key (cdr table))))
-    (if record
-        (set-cdr! record value)
-        (begin
-          (adjoin-set! (make-entry key value) (cdr table))
-          (display table))))
+(define (insert-tree! key value table)  
+  (set-cdr! table (adjoin-set! (make-entry key value) (cdr table)))
+  (display table)
   'ok)
 
 (define t1 (list '*table*))
+(define d1 (cdr t1))
 t1
-(set-cdr! t1 (make-tree-node (make-entry 42 'wet)))
+;(set-cdr! t1 (make-tree-node (make-entry 42 'wet)))
+t1
 (insert-tree! 42 'mom t1)
 t1
-
+;overwrite root test
 (insert-tree! 42 'dad t1)
-(define d1 (cdr t1))
+(insert-tree! 22 'son t1)
+(insert-tree! 32 'niece t1)
+(insert-tree! 12 'nephew t1)
+(insert-tree! 12 'cousin t1)
+(insert-tree! 62 'mom t1)
+(insert-tree! 72 'opa t1)
+(insert-tree! 82 'gram t1)
+(insert-tree! 82 'girondin t1)
+
+t1
