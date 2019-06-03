@@ -23,12 +23,6 @@
                         (cdr table)))))
   'ok)
 
-(define (fib n)
-  (cond ((= n 0) 0)
-        ((= n 1) 1)
-        (else (+ (fib (- n 1))
-                 (fib (- n 2))))))
-
 (define memoize
   (lambda (f)
     (let ((table (make-table)))
@@ -56,7 +50,11 @@
            (else 
             (+ (memo-fib (- n 1))
                (memo-fib (- n 2))))))))
-(memo-fib 50)
-(fib 50)
+
+(define four (+ 2 2))
+
+(memo-fib 10000)
+(memo-fib 10000)
+;(fib 50)
 ;Evaluate the subexpressions of the combination.
 ;Apply the value of the operator subexpression to the values of the operand subexpressions.
