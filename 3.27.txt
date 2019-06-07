@@ -1,0 +1,100 @@
+evaluate memo-fib
+
+global:
+ insert!, lookup, assoc, memoize
+ memo-fib -> E1
+
+(evaluate (define memo-fib))
+
+E1:
+ f: fib
+ table: (list *table*)
+ ptr -> global
+
+(memo-fib 3)
+
+E2
+ ptr -> E1
+ x: 3
+ prev: false
+ result: ?
+
+(f 3)
+E3 
+ ptr -> E2
+ n: 3
+
+(memo-fib 2)
+
+E4
+ ptr -> E3 
+ x: 2
+ prev: false
+ result?
+...
+(f 1)
+
+E7
+ ptr -> E6
+ n: 1
+ returns 1
+
+(back inside memo-fib 0)
+
+E6
+ptr -> E5 
+ x: 1
+ prev: false
+ result: 1
+
+(insert! table 1)
+
+E8
+ ptr -> E6
+ table (list 1 *table*)
+
+(second memo-fib of f 2)
+
+E9
+ ptr -> E5
+ x: 0
+ prev: false
+ result: ??
+
+E10
+ ptr -> E
+ n: 0 
+ returns 0
+
+(back in memo-fib 0)
+result: 0
+
+(insert! table 0)
+E11
+ ptr -> 10
+ table: (list 0 1)
+
+return to F 2
+
+(return 1 to memo-fib 2)
+E4
+ ptr -> E3 
+ x: 2
+ prev: false
+ result: 1
+
+(insert! 2 table)
+E12
+ ptr-> 10
+ table: (list (2 . 1)(0 . 0)(1 . 1)
+
+(return 1 to f 3)
+E3
+(second memo fib)
+ 
+E13
+ x: 1
+ 
+
+
+
