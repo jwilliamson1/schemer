@@ -43,3 +43,9 @@
     (and-gate c d out)
     (inverter and-out out)
     'ok))
+
+;delay 2 * inverter delay + 1 and-gate delay (if parallel execution)
+
+
+(define (ripple-carry-adder a b c-in sum carry)
+  (iter n
