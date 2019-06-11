@@ -1,0 +1,37 @@
+agenda after init
+
+or-act
+or-act
+and-act1
+and-act2
+invert-act
+and-act1
+and-act2
+
+agenda after
+
+set-signal input1 1
+
+or-act
+or-act
+and-act1
+and-act2
+invert-act
+and-act1
+and-act2
+new-val-a1-or-act
+new-val-a1-and-act
+
+after propagate
+or-act
+or-act
+and-act1
+and-act2
+invert-act
+and-act1
+and-act2
+or-act-a1'
+and-act-a1'
+new-and-act
+
+-- so if init wasn't run then the or-act-a1 call 

@@ -1,0 +1,91 @@
+(define the-agenda (make-agenda)) -> empty agenda
+(define inverter-delay 2) -> global delays
+(define and-gate-delay 3)
+(define or-gate-delay 5)
+Now we define four wires, placing probes on two of them:
+
+(define input-1 (make-wire)) -> wire with no probe
+(define input-2 (make-wire)) -> wire with no probe
+(define sum (make-wire)) 
+(define carry (make-wire))
+
+(probe 'sum sum) -> attach probe
+sum 0  New-value = 0 -> function runs
+
+(probe 'carry carry) -> attach probe 
+carry 0  New-value = 0 -> function runs
+
+(half-adder input-1 input-2 sum carry)
+--inside half adder
+local wires d and e created -> no probes
+
+or-gate called 
+
+--inside or-gate 
+
+2 or-action-procedure defined
+ captures variables
+
+or-action-procedure added to a1 and a2 respectively
+both actions run immediately
+
+new logical-or values calced 
+after-delay calls add a delay time and the lambdas that update outputs to agenda 
+in this case two or-action-procs and delays get added to the agenda with the same delay
+(perhaps times vary) a1 = or-delay a2 = or-delay + previous-or-delay
+
+return 'ok
+
+similar action for other gates and inverter
+
+half-adder return 'ok
+
+set-signal! input-1 1
+runs ONLY a1 or-action-proc and ONLY a1 1st and-action-proc again
+input-1 has new value of 1
+new-values recalced
+after delay adds these actions to update its' output to the agenda (after init run?)
+down stream invert and and gate remain unaffected
+returns 'done
+
+we never see the probe results because the action to update the final output wires are defered
+so S and C don't get called
+
+propagate calls it's first item which sets the first or-gates which is zero again
+propagate removes the first item
+propagate then calls it's second item which is the second or-action, this results in the same value so 
+nothing changes and nothing gets added to the agenda
+propgate calls and-lambda which does not change since it is 0
+same for other and-lambda
+invert-lambda gets called setting e to 1, this adds a new action to the agenda
+
+
+
+if  we did not call the procedure
+
+(define input-1 (make-wire)) -> wire with no probe
+(define input-2 (make-wire)) -> wire with no probe
+(define sum (make-wire)) 
+(define carry (make-wire))
+
+(probe 'sum sum)
+;sum 0  New-value = 0 would not happen
+
+(probe 'carry carry)
+;carry 0  New-value = 0 would not happen
+
+(half-adder input-1 input-2 sum carry)
+-- nothing happens when the action procedure gets add
+-- the agenda does not get set
+-- right now a call to propagate would do nothing
+ok
+
+(set!-signal! input-1 1) 
+-- this now makes first calls to a1 action procs
+-- or-gate and first and gate calcs new values and adds action to set signal to agenda after previous
+-- invert gets new input and adds action to update output to agenda
+-- final and does the same
+
+original delay times are not in the agenda
+
+proagate calls first item updating or-gates output wire triggering a recalc and a new value added to the agenda
