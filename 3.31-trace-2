@@ -1,0 +1,73 @@
+or-gate delay 5
+and-gate delay 3
+inverter delay 2
+
+agenda empty
+
+sum and carry have probe functions
+
+(define (half-adder a b s c)
+  (let ((d (make-wire)) (e (make-wire)))
+    (or-gate a b d)
+    (and-gate a b c)
+    (inverter c e)
+    (and-gate d e s)
+    'ok))
+
+half add input1 input2 sum carry
+input1 gets or-action1, and-action1
+ updates agenda	
+   5 (set-signal! d 0) 
+   3 (set-signal! c 0) 
+	
+input2 gets or-action2, and-action2
+	5 (set-signal! d 0) 
+   3 (set-signal! c 0) 
+   
+carry gets invert-input 
+	2 (set-signal! e 1) 
+
+local wire d gets and-gate-action
+  3 (set-signal! s 0)
+  
+local wire e gets and-gate-action
+  3 (set-signal! s 0)
+  
+agenda
+5 (set-signal! d 0) nothing
+3 (set-signal! c 0) -
+5 (set-signal! d 0) -
+3 (set-signal! c 0) -
+2 (set-signal! e 1) creates new action
+3 (set-signal! s 0) unaffected
+3 (set-signal! s 0) -
+
+if propagate were called now nothing would happen until 2 (set-signal! e 1)
+this would trigger e's 2nd and-gate action and create a new action 3 (set-signal! s 0)
+and put it at the end of the queue
+
+agenda time order
+2 (set-signal! e 1) creates new action at 2 + 3
+3 (set-signal! c 0) -
+3 (set-signal! c 0) -
+3 (set-signal! s 0) unaffected
+3 (set-signal! s 0) -
+5 (set-signal! d 0) nothing
+5 (set-signal! d 0) -
+
+calls first action and set current time to 2
+e's and-action gets called and creates a new action (set-signal! s 0) at 5 in the agenda
+
+2 (set-signal! e 1) creates new action
+3 (set-signal! c 0) -
+3 (set-signal! c 0) -
+3 (set-signal! s 0) unaffected
+3 (set-signal! s 0) -
+5 (set-signal! d 0) nothing
+5 (set-signal! d 0) -
+5 (set-signal! s 0) - nothing
+
+agenda (removed executed actions)
+action 3 (set-signal! s 0) nothing
+
+probe would have not been called
