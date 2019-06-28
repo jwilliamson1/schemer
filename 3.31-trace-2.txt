@@ -113,3 +113,16 @@ wire states: a:1, b:0, c:0, d:0, e:0, sum:0
 8 (SET-SIGNAL! s 1) -end (sum: 1)
 
 whole agenda should be wiped
+current state
+a:1, b:0, c:0, d:1, e:1, sum:1
+
+NEXT set-signal b 1
+new action or-act added: time: 13 set-signal! d 1 
+new action and-act added time: 11 set-signal! c 1
+
+propagate called
+13 set-signal! d 1 - nothing 
+11 set-signal! c 1 -adds invert action
+13 set-signal! e 0 - adds and gate action
+16 set-signal! s 1 END
+	
