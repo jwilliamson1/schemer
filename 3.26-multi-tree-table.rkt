@@ -1,4 +1,5 @@
 #lang sicp
+(define (atom? sexp) (not (pair? sexp)))
  (define (make-entry key value) (cons key value))
 (define (entry tree) (caar tree))
 (define (left-branch tree) (cadr tree))
@@ -66,7 +67,7 @@ test-tree-root
     table)
   (let ((key (car keys)))
     (cond ((null? set) (make-tree-node (make-entry key value)))
-          ((not (pair? set)) (make-tree-node (make-entry key value)))
+          ((atom? set) (make-tree-node (make-entry key value)))
           ((eq? key (caar set))
            (if (null? (cdr keys))
                (set-cdr! (car set)  value)
