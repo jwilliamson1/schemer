@@ -1,3 +1,4 @@
+
 #lang sicp
  (define (make-entry key value) (cons key value))
 (define (entry tree) (caar tree))
