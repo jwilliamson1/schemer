@@ -66,6 +66,7 @@ test-tree-root
     table)
   (let ((key (car keys)))
     (cond ((null? set) (make-tree-node (make-entry key value)))
+          ((not (pair? set)) (make-tree-node (make-entry key value)))
           ((eq? key (caar set))
            (if (null? (cdr keys))
                (set-cdr! (car set)  value)
@@ -108,3 +109,5 @@ t1
 (lookup '82 t1)
 (lookup '42 t1)
 (lookup '5 t1)
+
+(insert-tree! (cons 5 'mason) 'washington  12)
