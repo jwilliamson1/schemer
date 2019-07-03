@@ -1,4 +1,3 @@
-if cdr keys are null then add entry ie 12 5 value, 12 value, just add value
-if there are more keys create new table and pass rest of keys with value
+if cdr keys are null then overwrite entry ie 12 5 value, 12 value
 if match and more keys and cdr is tree then insert in the cdr of the set
-if match and it is the last key then overwrite cdr with value ie 12 5 3 12 5 if we get to just 5 then overwrite 3 tree
+if there are more keys create new table and pass rest of keys with value

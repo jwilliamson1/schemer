@@ -1,5 +1,5 @@
 #lang sicp
-(define (atom? sexp) (not (pair? sexp)))
+(define (atom? exp) (not (pair? exp)))
  (define (make-entry key value) (cons key value))
 (define (entry tree) (caar tree))
 (define (left-branch tree) (cadr tree))
@@ -7,6 +7,8 @@
 (define (make-tree entry left right)
   (list entry left right))
 (define (make-tree-node x) (make-tree x '() '()))
+
+(define tree? pair?)
 
 (define test-tree-lbranch (make-tree (cons 3 'three) '() '()))
 (define test-tree-rbranch (make-tree (cons 7 'seven) '() '()))
@@ -66,13 +68,13 @@ test-tree-root
     ;(display table)
     table)
   (let ((key (car keys)))
-    (cond ((null? set) (make-tree-node (make-entry key value)))
-          ((atom? set) (make-tree-node (make-entry key value)))
-          ((eq? key (caar set))
-           (if (null? (cdr keys))
-               (set-cdr! (car set)  value)
-               (set-cdr! (car set) (insert-tree! (list '*table*) value (cdr keys) )))
-           set)
+
+    (cond  ((null? (cdr keys)) (make-tree-node (make-entry key value)))
+           ((or (null? set)(eq? key (caar set)))
+            (if (tree? (cdar set))
+                (insert-tree! (cdar set) value (cdr keys))
+                (insert-tree! (list '*table*) value (cdr keys))))
+
           ((< key (entry set))
            (set-left-branch! set (adjoin-set! (left-branch set) keys value ))
            set)
@@ -86,21 +88,18 @@ test-tree-root
   'ok)
 
 (define t1 (list '*table*))
-(define d1 (cdr t1))
+;(define d1 (cdr t1))
 t1
 ;(set-cdr! t1 (make-tree-node (make-entry 42 'wet)))
-t1
-(insert-tree! t1 'mom 42)
+;t1
+;(insert-tree! t1 'mom 42)
 t1
 ;overwrite root test
-(insert-tree! t1 'dad 42)
-(insert-tree! t1 'son 22)
-(insert-tree! t1 'niece  32)
-(insert-tree! t1 'nephew  12)
+
 (insert-tree! t1 'cousin  12)
 (insert-tree! t1 'cousina  9 3)
-(insert-tree! t1 'cousin-twice-removed 12 5) ;((12 . (*table (5 . cousin))
-(insert-tree! t1 'cousin-thrice-removed 12 5 3) ;((12 . (*table (5 . cousin))
+;(insert-tree! t1 'cousin-twice-removed 12 5) ;((12 . (*table (5 . cousin))
+;(insert-tree! t1 'cousin-thrice-removed 12 5 3) ;((12 . (*table (5 . cousin))
 ;(insert-tree! 'mom t1 62)
 ;(insert-tree! 'opa t1 72)
 ;(insert-tree! 'gram t1 82)
