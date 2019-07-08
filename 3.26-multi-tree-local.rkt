@@ -28,10 +28,6 @@
           x 
           (right-branch set)))))
 
-;(element-of-set? 3 test-tree-root)
-;element-of-set? 4 test-tree-root)
-
-
 
 (define (lookup keys table)
   (let ((record (assoc keys (cdr table))))
@@ -51,22 +47,6 @@
         ((< (car keys) (caar records))
          (assoc keys (left-branch records)))        
         (else (assoc keys (right-branch records)))))
-
-(define (insert! key value table)
-  (let ((record (assoc key (cdr table))))
-    (if record
-        (set-cdr! record value)
-        (set-cdr! table
-                  (cons (cons key value) 
-                        (cdr table)))))
-  'ok)
-
-(define (make-record key value)
-  (cons key value))
-(define record car)
-(define (add-new-entry! empty-node key value)
-  (display (list "add-new-entry!" empty-node key value))
-  (set-cdr! empty-node (make-tree (make-record key value) '() '())))
 
 (define (set-left-branch! tree entry) (set-car! (cdr tree) entry))
 (define (set-right-branch! tree entry) (set-car! (cddr tree) entry))
@@ -99,7 +79,8 @@
            (set-right-branch! set (adjoin-set! keys value (right-branch set)))
            set))))
 
-(define (insert-tree! keys value table)  
+(define (insert-tree! keys value table)
+  (display (list "INSERT TREE PARAMS:" keys value table))
   (set-cdr! table (adjoin-set! keys value (cdr table)))
   (display table)
   'ok)
@@ -138,3 +119,17 @@ t2
 (lookup '(11 2/3) t2)
 (lookup '(12 -3) t2)
 (lookup '(12 -3 40/100 .333333) t2)
+
+(define (new-table)
+  (let ((table (list '*table*)))
+    (define (print) (display table)(newline))
+    (define (dispatch m)
+      (cond ((eq? m 'lookup) (lambda (keys)(lookup keys table)))
+            ((eq? m 'print) print)
+            ((eq? m 'insert) (lambda (keys value) (insert-tree! keys value table)))
+            (else "Rnnnt-eeeeeer! Invalid command")))
+    dispatch))
+
+(define t4 (new-table))
+((t4 'insert) '(17 76) 'dad)
+((t4 'print))

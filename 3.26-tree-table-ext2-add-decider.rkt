@@ -33,24 +33,24 @@
 
 
 
-(define (lookup keys table)
-  (let ((record (assoc keys (cdr table))))
+(define (lookup key table)
+  (let ((record (assoc key (cdr table))))
     (if record
         (cdr record)
         false)))
 
-(define (assoc keys records)
-  (define (handle-matches keys record)
-    (cond ((null? keys) record)
-          ((pair? (cdr record)) (assoc keys (cdr record)))
-          (else #f)))
-  (display (list "assoc params" "KEYS:" keys "RECORDS:" records))(newline)
+(define (assoc key records)
   (cond ((or (null? records) (null? (car records))) false)
-        ((equal? (car keys) (caar records))
-         (handle-matches (cdr keys) (car records)))
-        ((< (car keys) (caar records))
-         (assoc keys (left-branch records)))        
-        (else (assoc keys (right-branch records)))))
+        ((equal? key (caar records))
+         (car records))
+        ((< key (caar records))
+         (assoc key (left-branch records)))        
+        (else (assoc key (right-branch records)))))
+
+test-tree-root
+(assoc 3 test-tree-root)
+(assoc 7 test-tree-root)
+(assoc -4 test-tree-root)
 
 (define (insert! key value table)
   (let ((record (assoc key (cdr table))))
@@ -135,6 +135,3 @@ t2
 (insert-tree! '(13) 'motorsport t2)
 (insert-tree! '(11) 'motorville t2)
 (insert-tree! '(11 2/3) 'dank t2)
-(lookup '(11 2/3) t2)
-(lookup '(12 -3) t2)
-(lookup '(12 -3 40/100 .333333) t2)
