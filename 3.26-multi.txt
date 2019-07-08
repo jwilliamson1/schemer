@@ -1,3 +1,13 @@
+insert-tree1 t1 12 700 -13 'value -Set is null; Need to create 3 trees
+insert-tree1 t1 12 700 'replace -If eq? caar set keys; Need to traverse and then replace when cdr keys null
+insert-tree1 t1 12 700 -5 'lower -If eq? caar set keys; Need to traverse then create tree
+insert-tree1 t1 12 700 -4 'lowerleft -If eq? caar set keys; Need to traverse then create entry
+
 if cdr keys are null then overwrite entry ie 12 5 value, 12 value
+(12 5 7) if cdr keys continue then 
+  if set null? create entry
+  if set atom? create entry
+  if set is tree? insert-tree cdr keys value
+  
 if match and more keys and cdr is tree then insert in the cdr of the set
 if there are more keys create new table and pass rest of keys with value

@@ -1,3 +1,4 @@
+
 #lang sicp
 (define make-table '(*table*))
 (define (atom? exp) (not (pair? exp)))
