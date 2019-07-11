@@ -255,9 +255,29 @@
             (error "square less than 0: 
                     SQUARER" 
                    (get-value b))
-            alternative1)
-        alternative2))
-  (define (process-forget-value) body1)
-  (define (me request) body2)
-  rest of definition
+            (set-value! a (sqrt (get-value b)) me))
+        (let ((a-val (get-value a)))
+          (set-value! b (* a-val a-val) me))))
+  (define (process-forget-value)
+    (forget-value! a)
+    (forget-value! b))
+  (define (me request)
+    (cond ((eq? request 'I-have-a-value)
+           (process-new-value))
+          ((eq? request 'I-lost-my-value)
+           (process-forget-value))
+          (else
+           (error "Unknown request: 
+                   SQUARER" 
+                  request))))
+  (connect a me)
+  (connect b me)
   me)
+
+(define y (make-connector))
+(define z (make-connector))
+(probe "y input" y)
+(probe "z input" z)
+(squarer y z)
+;(set-value! y 25 'user)
+(set-value! z 2 'user)

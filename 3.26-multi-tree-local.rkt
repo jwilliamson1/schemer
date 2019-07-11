@@ -72,9 +72,10 @@
       (cond ((eq? m 'lookup) (lambda (keys)(lookup keys)))
             ((eq? m 'print) print)
             ((eq? m 'insert) (lambda (keys value) (insert-tree! keys value)))
-            (else "Rnnnt-eeeeeer! Invalid command")))
+            (else "Invalid command")))
     dispatch))
 
+;PROCEDURAL INTERFACES
 (define t4 (new-table))
 (define (insert! table keys value)
   ((table 'insert) keys value))
@@ -83,10 +84,14 @@
 (define (lookup table keys)
   ((table 'lookup) keys))
 
+;TESTS
 (insert! t4 '(76 -456) 'jesuit)
 (insert! t4 '(76 -834) 'chomsky)
 (insert! t4 '(76 -1000) 'regime)
 (insert! t4 '(50 1/2) 'francoi)
 (insert! t4 '(50 1/2 .333) 'twei)
-(lookup t4 '(50 1/2 .333))
-(print t4)
+(insert! t4 '(50 1/2 .666) 'cambodia)
+(lookup t4 '(50 1/2 .333)) ;twei
+(lookup t4 '(76 -456)) ;false because it should have been overwritten
+(insert! t4 '(76 -456) 'carmelite)
+(print t4);(*table* (76 (-456 . carmelite) ((-834 . chomsky) ((-1000 . regime) () ()) ()) ()) ((50 (1/2 (0.333 . twei) () ((0.666 . cambodia) () ())) () ()) () ()) ())
