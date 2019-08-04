@@ -111,6 +111,9 @@
   (connect sum me)
   me)
 
+(define (subtracter s1 s2 sum)
+  (adder s1 (* s2 -1)))
+
 (define (multiplier m1 m2 product)
   (define (process-new-value)
     (cond ((or (and (has-value? m1) 
@@ -154,6 +157,9 @@
   (connect m2 me)
   (connect product me)
   me)
+
+(define (divider d1 d2 sum)
+  (multiplier d1 (/ 1 d2)))
 
 (define (constant value connector)
   (define (me request)

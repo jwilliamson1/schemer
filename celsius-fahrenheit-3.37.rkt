@@ -111,9 +111,6 @@
   (connect sum me)
   me)
 
-(define (subtracter a1 a2 sum)
-  (adder a1 (* a2 -1)))
-
 (define (multiplier m1 m2 product)
   (define (process-new-value)
     (cond ((or (and (has-value? m1) 
@@ -158,9 +155,6 @@
   (connect product me)
   me)
 
-(define (divider a1 a2 sum)
-  (multiplier a1 (/ 1 a2)))
-
 (define (constant value connector)
   (define (me request)
     (error "Unknown request: CONSTANT" 
@@ -193,23 +187,39 @@
 (define (inform-about-no-value constraint)
   (constraint 'I-lost-my-value))
 
-(define (celsius-fahrenheit-converter c f)
-  (let ((u (make-connector))
-        (v (make-connector))
-        (w (make-connector))
-        (x (make-connector))
-        (y (make-connector)))
-    (multiplier c w u)
-    (multiplier v x u)
-    (adder v y f)
-    (constant 9 w)
-    (constant 5 x)
-    (constant 32 y)
-    'ok))
+(define (c+ x y)
+  (let ((z (make-connector)))
+    (adder x y z)
+    z))
+
+(define (c+ x y)
+  (let ((z (make-connector)))
+    (adder z y x)
+    z))
+
+(define (c* x y)
+  (let ((z (make-connector)))
+    (multiplier x y z)
+    z))
+
+(define (c/ x y)
+  (let ((z (make-connector)))
+    (multiplier z y x)
+    z))
+
+(define (cv v)
+  (let ((z (make-connector)))
+    (constant v z)
+    z))
+
+(define (celsius-fahrenheit-converter x)
+  (c+ (c* (c/ (cv 9) (cv 5))
+          x)
+      (cv 32)))
 
 (define C (make-connector))
-(define F (make-connector))
-(celsius-fahrenheit-converter C F)
+(define F (celsius-fahrenheit-converter C))
+;(celsius-fahrenheit-converter C F)
 ;ok
 
 (probe "Celsius temp" C)
