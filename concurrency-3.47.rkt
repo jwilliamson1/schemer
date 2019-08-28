@@ -1,5 +1,4 @@
 #lang racket
-(require ffi/unsafe/atomic)
 (require rnrs/mutable-pairs-6)
 
 (define (parallel-execute . procs)
@@ -7,7 +6,7 @@
        (map (lambda (proc) (thread proc))
             procs)))
 
-(define (test-and-set!-interleave cell)
+(define (test-and-set! cell)
   (if (mcar cell)
       true
       (begin (set-mcar! cell true)
@@ -17,7 +16,7 @@
   (let ((cell (mcons #f '())))
     (define (the-mutex m)
       (cond ((eq? m 'acquire)
-             (if (test-and-set!-interleave cell)
+             (if (test-and-set! cell)
                  (the-mutex 'acquire)
                  'done)) ; retry
             ((eq? m 'release) (clear! cell))))
@@ -30,7 +29,7 @@
         (release-mutex (make-mutex)))
     (define (aquire)
       (aquire-mutex 'aquire)
-      (let ((count (mcar count)))
+      (let ((count (mcar cell)))
         (if (> count 0)
             (begin (set-car! cell (- count 1))
                    (aquire-mutex 'release))
@@ -50,12 +49,12 @@
     
 
 (define (make-serializer)
-  (let ((mutex (make-semaphore 1)))
+  (let ((semaphore (make-semaphore 2)))
     (lambda (p)
       (define (serialized-p . args)
-        (mutex 'acquire)
+        (semaphore 'acquire)
         (let ((val (apply p args)))
-          (mutex 'release)
+          (semaphore 'release)
           val))
       serialized-p)))
             
@@ -84,9 +83,14 @@
 
 
 (define serializer-test (make-serializer))
+(define semaphore (make-semaphore 2))
 (define shared-1 (mcons 0 '()))
 
 (define (named a-shared n) (set-mcar! a-shared (+ n (mcar a-shared))))
+
+((semaphore 'aquire))
+((semaphore 'aquire))
+((semaphore 'aquire))
 
 (mcar shared-1)
 
@@ -99,8 +103,9 @@
 (define (withdraw account amount)
   (let ((s (account 'serializer))
         (w (account 'withdraw)))
-    (((s 'aquire) w) amount)
-    ((s 'release))))
+    (s 'aquire)
+    (w amount)
+    (s 'release)))
 
 (define (balance account)
   (account 'balance))
@@ -108,16 +113,21 @@
 ;tests
 (define a1 (make-account-and-serializer 1000000000))
 (define a2 (make-account-and-serializer 1000000000))
-
-(parallel-execute
- (lambda () (withdraw a1 1))
- (lambda () (withdraw a1 2))
- (lambda () (withdraw a1 3))
- (lambda () (withdraw a1 4))
- (lambda () (withdraw a1 1))
- (lambda () (withdraw a1 2))
- (lambda () (withdraw a1 3))
- (lambda () (withdraw a1 4))
- )
-
+(define (repeat n)
+  (if (= n 0)
+      'done
+      (begin
+      (parallel-execute
+       (lambda () (withdraw a1 1))
+       (lambda () (withdraw a1 2))
+       (lambda () (withdraw a1 3))
+       (lambda () (withdraw a1 4))
+       (lambda () (withdraw a1 1))
+       (lambda () (withdraw a1 2))
+       (lambda () (withdraw a1 3))
+       (lambda () (withdraw a1 4))
+       )
+      (repeat (- n 1)))
+      ))
+(repeat 1000)
 (balance a1)
