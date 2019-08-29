@@ -49,12 +49,12 @@
     
 
 (define (make-serializer)
-  (let ((semaphore (make-semaphore 2)))
+  (let ((mutex (make-mutex)))
     (lambda (p)
       (define (serialized-p . args)
-        (semaphore 'acquire)
+        (mutex 'acquire)
         (let ((val (apply p args)))
-          (semaphore 'release)
+          (mutex 'release)
           val))
       serialized-p)))
             
@@ -87,7 +87,10 @@
 (define shared-1 (mcons 0 '()))
 
 (define (named a-shared n) (set-mcar! a-shared (+ n (mcar a-shared))))
+(define mutex (make-mutex))
+(mutex 'aquire)
 
+((semaphore 'aquire))
 ((semaphore 'aquire))
 ((semaphore 'aquire))
 ((semaphore 'aquire))
@@ -109,7 +112,12 @@
 
 (define (balance account)
   (account 'balance))
+(define s (make-serializer))
+(define cell (mcons 0 '()))
+(define counter
+  (lambda () (set-mcar! cell (+ 1 (mcar cell)))))
 
+(define scounter (s counter))
 ;tests
 (define a1 (make-account-and-serializer 1000000000))
 (define a2 (make-account-and-serializer 1000000000))
@@ -118,16 +126,17 @@
       'done
       (begin
       (parallel-execute
-       (lambda () (withdraw a1 1))
-       (lambda () (withdraw a1 2))
-       (lambda () (withdraw a1 3))
-       (lambda () (withdraw a1 4))
-       (lambda () (withdraw a1 1))
-       (lambda () (withdraw a1 2))
-       (lambda () (withdraw a1 3))
-       (lambda () (withdraw a1 4))
+       (lambda () (scounter))
+       (lambda () (scounter))
+       (lambda () (scounter))
+       (lambda () (scounter))
+       (lambda () (scounter))
+       (lambda () (scounter))
+       (lambda () (scounter))
+       (lambda () (scounter))
        )
       (repeat (- n 1)))
       ))
-(repeat 1000)
+(repeat 10)
 (balance a1)
+(mcar cell)
