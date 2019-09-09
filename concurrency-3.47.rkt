@@ -18,12 +18,12 @@
   (define (make-test-cell) (mcons #f '()))
   (let ((cell (make-test-cell)))
     (define (the-mutex m)
-      (cond ((eq? m 'acquire)
+      (cond ((eq? m 'aquire)
              (if (test-and-set! cell)
-                 (the-mutex 'acquire)
-                 (begin (display "false")
-                        #f))) ; retry
-            ((eq? m 'release) (clear! cell))))
+                 (the-mutex m)
+                 #f))
+            ((eq? m 'release) (clear! cell))
+            (else (error "no-op"))))
     the-mutex))
 
 (define (make-semaphore n)
@@ -94,7 +94,9 @@
 (define (named a-shared n) (set-mcar! a-shared (+ n (mcar a-shared))))
 (define mutex (make-mutex))
 (mutex 'aquire)
+(mutex 'release)
 (mutex 'aquire)
+(mutex 'release)
 (mutex 'aquire)
 
 ((semaphore 'aquire))
