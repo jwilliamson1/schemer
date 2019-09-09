@@ -29,18 +29,15 @@
                 (begin 
                   (displayln (list "count:" (mcar count-cell)))
                   (clear! aquire-cell))
-                'semaphore_busy))))
+                "all busy"))))
     (define (release)
       (if (test-and-set! release-cell)
           (release)
           (let ((count (mcar count-cell)))
             (if (< count n)
                 (begin (set-car! count-cell (+ 1 (mcar count-cell)))
-                       (displayln (list "count:" (mcar count-cell)))
                        (clear! aquire-cell)
-                       (clear! release-cell)
-                       ;;(clear! release-cell)
-                       )
+                       (clear! release-cell))
                 'fullcount))))
     (define (dispatch m)
       (cond ((eq? m 'aquire) aquire)
@@ -84,7 +81,7 @@
 
 
 (define serializer-test (make-serializer))
-(define semaphore (make-semaphore 3))
+(define semaphore (make-semaphore 2))
 (define shared-1 (mcons 0 '()))
 
 (define (named a-shared n) (set-mcar! a-shared (+ n (mcar a-shared))))
@@ -96,8 +93,6 @@
 ((semaphore 'release))
 ((semaphore 'aquire))
 ((semaphore 'release))
-((semaphore 'release))
-
 (display "got here")
 (mcar shared-1)
 
