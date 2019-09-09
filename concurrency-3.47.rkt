@@ -18,7 +18,7 @@
       (cond ((eq? m 'acquire)
              (if (test-and-set! cell)
                  (the-mutex 'acquire)
-                 'done)) ; retry
+                 #f)) ; retry
             ((eq? m 'release) (clear! cell))))
     the-mutex))
 (define (clear! cell) (set-car! cell false))
@@ -32,13 +32,15 @@
       (let ((count (mcar cell)))
         (if (> count 0)
             (begin (set-car! cell (- count 1))
-                   (aquire-mutex 'release))
+                   (aquire-mutex 'release)
+                   (list "count: " count))
             "stay locked")))
     (define (release)
       (release-mutex 'aquire)
       (let ((count (mcar count)))
         (if (< count n)
             (begin (set-car! cell (+ 1 (mcar cell)))
+                   (aquire-mutex 'release)
                    (release-mutex 'release))
             'fullcount)))
     (define (dispatch m)
@@ -88,6 +90,7 @@
 
 (define (named a-shared n) (set-mcar! a-shared (+ n (mcar a-shared))))
 (define mutex (make-mutex))
+(mutex 'aquire)
 (mutex 'aquire)
 
 ((semaphore 'aquire))
