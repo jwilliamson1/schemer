@@ -12,7 +12,6 @@
       (begin (set-mcar! cell true)
              false)))
 
-
 (define (clear! cell) (set-car! cell false))
 
 (define (make-semaphore n)

@@ -12,16 +12,19 @@
       (begin (set-mcar! cell true)
              false)))
 
+(define (clear! cell) (set-car! cell false))
+
 (define (make-mutex)
-  (let ((cell (mcons #f '())))
+  (define (make-test-cell) (mcons #f '()))
+  (let ((cell (make-test-cell)))
     (define (the-mutex m)
       (cond ((eq? m 'acquire)
              (if (test-and-set! cell)
                  (the-mutex 'acquire)
-                 #f)) ; retry
+                 (begin (display "false")
+                        #f))) ; retry
             ((eq? m 'release) (clear! cell))))
     the-mutex))
-(define (clear! cell) (set-car! cell false))
 
 (define (make-semaphore n)
   (let ((cell (mcons n '()))
@@ -92,7 +95,9 @@
 (define mutex (make-mutex))
 (mutex 'aquire)
 (mutex 'aquire)
+(mutex 'aquire)
 
+((semaphore 'aquire))
 ((semaphore 'aquire))
 ((semaphore 'aquire))
 ((semaphore 'aquire))
@@ -140,6 +145,6 @@
        )
       (repeat (- n 1)))
       ))
-(repeat 10)
+;(repeat 10)
 (balance a1)
 (mcar cell)
