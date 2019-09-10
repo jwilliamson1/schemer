@@ -12,7 +12,6 @@
       (begin (set-mcar! cell true)
              false)))
 
-
 (define (clear! cell) (set-car! cell false))
 
 (define (make-semaphore n)
@@ -29,15 +28,18 @@
                 (begin 
                   (displayln (list "count:" (mcar count-cell)))
                   (clear! aquire-cell))
-                "all busy"))))
+                'semaphore_busy))))
     (define (release)
       (if (test-and-set! release-cell)
           (release)
           (let ((count (mcar count-cell)))
             (if (< count n)
                 (begin (set-car! count-cell (+ 1 (mcar count-cell)))
+                       (displayln (list "count:" (mcar count-cell)))
                        (clear! aquire-cell)
-                       (clear! release-cell))
+                       (clear! release-cell)
+                       ;;(clear! release-cell)
+                       )
                 'fullcount))))
     (define (dispatch m)
       (cond ((eq? m 'aquire) aquire)
@@ -47,7 +49,7 @@
     
 
 (define (make-serializer)
-  (let ((mutex (make-semaphore 0)))
+  (let ((mutex (make-semaphore 1)))
     (lambda (p)
       (define (serialized-p . args)
         (mutex 'acquire)
@@ -81,7 +83,7 @@
 
 
 (define serializer-test (make-serializer))
-(define semaphore (make-semaphore 2))
+(define semaphore (make-semaphore 3))
 (define shared-1 (mcons 0 '()))
 
 (define (named a-shared n) (set-mcar! a-shared (+ n (mcar a-shared))))
@@ -93,21 +95,20 @@
 ((semaphore 'release))
 ((semaphore 'aquire))
 ((semaphore 'release))
+((semaphore 'release))
+
 (display "got here")
 (mcar shared-1)
 
 (define (deposit account amount)
   (let ((s (account 'serializer))
         (d (account 'deposit)))
-    (((s 'aquire) d) amount)
-    ((s 'release))))
+    ((s d) amount)))
 
 (define (withdraw account amount)
   (let ((s (account 'serializer))
         (w (account 'withdraw)))
-    (s 'aquire)
-    (w amount)
-    (s 'release)))
+    ((s w) amount)))
 
 (define (balance account)
   (account 'balance))
@@ -115,11 +116,31 @@
 (define cell (mcons 0 '()))
 (define counter
   (lambda () (set-mcar! cell (+ 1 (mcar cell)))))
-
-(define scounter (s counter))
 ;tests
 (define a1 (make-account-and-serializer 1000000000))
 (define a2 (make-account-and-serializer 1000000000))
+
+(define (repeat-s n)
+  (if (= n 0)
+      'done
+      (begin
+      (parallel-execute
+       (lambda () (withdraw a1 50))
+       (lambda () (withdraw a1 20))
+       (lambda () (withdraw a1 600))
+       (lambda () (deposit a2 600))
+       (lambda () (deposit a2 20))
+       (lambda () (deposit a2 50))       
+       )
+      (repeat-s (- n 1)))
+      ))
+(repeat-s 100)
+
+(balance a1)
+(balance a2)
+
+(define scounter (s counter))
+
 (define (repeat n)
   (if (= n 0)
       'done
@@ -137,5 +158,4 @@
       (repeat (- n 1)))
       ))
 (repeat 10)
-(balance a1)
 (mcar cell)
