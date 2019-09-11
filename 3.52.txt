@@ -12,22 +12,23 @@ sum 0
    (stream-enumerate-interval 1 20)))
 sum 1
 seq: 1, rest
-(define y (stream-filter even? seq)) ;should go to first even which is 2
-sum 3
-y 2: rest
-seq: unchanged
+
+(define y (stream-filter even? seq)) ;should go to first even which is 3 (1+2+3 = 6)
+sum 6
+y: 3, rest
+seq: seen 3
 
 (define z 
   (stream-filter 
    (lambda (x) 
      (= (remainder x 5) 0)) seq)) ;if no delay would for multiple re-accum same numbers
-sum 14
-z 5: rest
+sum 10
+seq: seen 4
+z 10: rest
 
-(stream-ref y 7) ;should skip accums between 2-5 
-;2,4,6,8,10,12,14,16
-sum (+ 14 6, 7, 8..16)
-sum 135
+(stream-ref y 7)
+10, 15, 21, 28, 36, 45, 55, 66, 78
+sum 
 (display-stream z) 
 ouput: 5 10 15 20
 sum (+ 135 17 ...20)74
