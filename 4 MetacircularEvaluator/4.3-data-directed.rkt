@@ -1,0 +1,41 @@
+#lang racket
+(define *the-table* (make-hash))
+(define (put key value)(hash-set! *the-table* key value))
+(define (get key)(hash-ref *the-table* key #f))
+
+(define (type-tag exp)
+  (car exp))
+
+(define (text-of-quotation exp)
+  (cadr exp))
+
+(define (self-evaluating? exp)
+  (cond ((number? exp) true)
+        ((string? exp) true)
+        (else false)))
+
+(define (variable? exp) (symbol? exp))
+(define (lookup-variable-value)(error "not implemented"))
+
+(define (install-eval-actions)
+  (put 'self-evaluating (lambda (x y) x))
+  (put 'variable (lambda (x y)(lookup-variable-value)))
+  (put 'quote (lambda (x y)(text-of-quotation x)))
+  'Done)
+
+(install-eval-actions)
+
+(define (eval exp env)
+  (cond ((self-evaluating? exp) 
+         exp)
+        ((variable? exp) 
+         (lookup-variable-value exp env))
+        (else
+         (let ((op (get (type-tag exp))))
+          (if op
+              (op exp env)
+              (error "operation not found"))))))
+
+(eval 1 (list '()))
+(eval "echo" (list '()))
+(eval (list 'quote 'text 'more) (list '()))
