@@ -1,0 +1,13 @@
+#lang racket
+(define *the-table* (make-hash))
+(define (put key value)(hash-set! *the-table* key value))
+(define (get key)(hash-ref *the-table* key #f))
+
+(define (type-tag exp)
+  (car exp))
+
+(define (eval exp env)
+  (let ((op (get (type-tag exp))))
+    (if (op)
+        (op exp env)
+        (error "operation not found"))))
