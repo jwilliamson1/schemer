@@ -1,0 +1,11 @@
+S01 2 * s02
+to 10 = 6/3/1 unique left
+
+to 15 = 8/4/2/1 unique left
+
+1,n = n/2 over and over until = 1
+
+99/100 = above ^ 99
+100/100= above ^ 100
+(6,14) = 542
+(2^6 - 1) + 2^(6 - 1) + (14 - 6 - 1) * 2^6 -1
