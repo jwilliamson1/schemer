@@ -6,8 +6,38 @@
 (define (type-tag exp)
   (car exp))
 
+
+(define (self-evaluating? exp)
+  (cond ((number? exp) true)
+        ((string? exp) true)
+        (else false)))
+
+(define (variable? exp) (symbol? exp))
+
+; specific implementations
+(define (lookup-variable-value)(error "not implemented"))
+(define (text-of-quotation exp)
+  (cadr exp))
+
+(define (install-eval-actions)
+  (put 'self-evaluating (lambda (x y) x))
+  (put 'variable (lambda (x y)(lookup-variable-value)))
+  (put 'quote (lambda (x y)(text-of-quotation x)))
+  'Done)
+
+(install-eval-actions)
+
 (define (eval exp env)
-  (let ((op (get (type-tag exp))))
-    (if (op)
-        (op exp env)
-        (error "operation not found"))))
+  (cond ((self-evaluating? exp) 
+         exp)
+        ((variable? exp) 
+         (lookup-variable-value exp env))
+        (else
+         (let ((op (get (type-tag exp))))
+          (if op
+              (op exp env)
+              (error "operation not found"))))))
+
+(eval 1 (list '()))
+(eval "echo" (list '()))
+(eval (list 'quote 'text 'more) (list '()))
