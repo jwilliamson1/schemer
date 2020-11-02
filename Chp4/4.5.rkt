@@ -192,6 +192,12 @@
 (define (cond->if exp)
   (expand-clauses (cond-clauses exp)))
 
+(define (test-then-apply? exp)
+  (eq? (car exp) '=>))
+
+(define (recipient-func action-clause)
+  (cdr action-clause))
+
 (define (expand-clauses clauses)
   (if (null? clauses)
       'false     ; no else clause
@@ -204,7 +210,14 @@
                 (error "ELSE clause isn't 
                         last: COND->IF"
                        clauses))
-            (make-if (cond-predicate first)
+            (if (test-then-apply? (cond-actions first))
+                (let ((pred-result (eval (cond-predicate first))))
+                      (recipient (recipient-func (cond-actions first)))
+                  (make-if pred-result
+                           (recipient pred-result)
+                           (expand-clauses
+                            rest))))                           
+                (make-if (cond-predicate first)
                      (sequence->exp 
                       (cond-actions first))
                      (expand-clauses 
