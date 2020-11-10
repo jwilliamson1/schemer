@@ -248,3 +248,13 @@
           ((null? exps) error "No expressions in let block")
           ((null? body) error "No body in let block")
           (else (cons (make-lambda vars body) exps)))))
+
+(define (let*? exp) 
+  (tagged-list? exp 'let*))
+
+(define (first-var vars) car vars)
+(define (first-exp exps) car exps)
+(define (last-var? vars) (eq? (cdr vars) '()))
+
+(define (let*->nested-lets let*-block)
+  (cond ((last-var?

@@ -243,7 +243,7 @@
 (define (let->combination let-block)
   (let ((vars (let-variables let-block))
         (exps (let-expressions let-block))
-        (body (let-body let-block)))
+        (bosy (let-body let-block)))
     (cond ((null? vars) error "No variables in let block")
           ((null? exps) error "No expressions in let block")
           ((null? body) error "No body in let block")
