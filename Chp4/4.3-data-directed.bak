@@ -6,8 +6,6 @@
 (define (type-tag exp)
   (car exp))
 
-(define (text-of-quotation exp)
-  (cadr exp))
 
 (define (self-evaluating? exp)
   (cond ((number? exp) true)
@@ -15,7 +13,11 @@
         (else false)))
 
 (define (variable? exp) (symbol? exp))
+
+; specific implementations
 (define (lookup-variable-value)(error "not implemented"))
+(define (text-of-quotation exp)
+  (cadr exp))
 
 (define (install-eval-actions)
   (put 'self-evaluating (lambda (x y) x))
