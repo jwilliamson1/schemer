@@ -33,14 +33,8 @@
 
 (define let1 '(let ((x (+ 5 5)))(+ x 1)))
 
-(define let2 '(let ((x (+ 1 2))
-                    (y (* x 2)))
-                (+ 1 x y)))
-
-(define let3 '(let* ((x 3)
-                    (y (+ x 2))
-                    (z (+ x y 5)))
-               (* x z)))
+(define let2 '(let ((x (+ free 2))
+                    (y (* free2 free3))) (+ 1 x y)))
 
 (define (last-var? vars) (null? (cdr vars)))
 
@@ -48,7 +42,7 @@
 
   (define (let*-iter real-body vars exps)
     (if (last-var? vars)
-         (list(cons (make-lambda vars real-body) exps))
+         (cons (make-lambda vars real-body) exps)
          (cons (make-lambda (list (car vars))
                             (let*-iter real-body (cdr vars) (cdr exps)))
                             (list (car exps)))))
