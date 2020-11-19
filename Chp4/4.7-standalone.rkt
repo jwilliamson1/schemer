@@ -47,15 +47,15 @@
 
 (define (let*->nested let-block)
   (define (let*-iter real-body vars exps)
-    (if (last-var? vars)
-        (list (list (make-lambda vars real-body) (car exps)))
+    (if (null? vars)
+        (list (list (make-lambda vars real-body)))
         (list (list (make-lambda (list (car vars))
-                           (let*-iter real-body (cdr vars) (cdr exps)))
-              (car exps)))))
-  (let ((var-list (let-variables let-block))
-        (exps-list (let-expressions let-block))
-        (body (let-body let-block)))
-    (car (let*-iter body var-list exps-list))))
+                                 (let*-iter real-body (cdr vars) (cdr exps)))
+                    (car exps)))))
+  (car (let*-iter
+        (let-body let-block)
+        (let-variables let-block)
+        (let-expressions let-block))))
 
 (let*->nested let3)
 

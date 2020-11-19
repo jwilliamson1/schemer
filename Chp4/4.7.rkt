@@ -238,7 +238,7 @@
   (map car (let-assignments let-block)))
 
 (define (let-body let-block)
-  (caadr let-block))
+  (cddr let-block))
 
 (define (let->combination let-block)
   (let ((vars (let-variables let-block))
@@ -249,12 +249,38 @@
           ((null? body) error "No body in let block")
           (else (cons (make-lambda vars body) exps)))))
 
-(define (let*? exp) 
-  (tagged-list? exp 'let*))
+(define let1 '(let ((x (+ 5 5)))(+ x 1)))
 
-(define (first-var vars) car vars)
-(define (first-exp exps) car exps)
-(define (last-var? vars) (eq? (cdr vars) '()))
+(define let2 '(let ((x (+ 1 2))
+                    (y (* x 2)))
+                (+ 1 x y)))
 
-(define (let*->nested-lets let*-block)
-  (cond ((last-var?
+(define let3 '(let* ((w 3)
+                    (x w)
+                    (y (+ x 2))
+                    (z (+ x y 5)))
+               (* x z)))
+
+(define (last-var? vars) (null? (cdr vars)))
+
+(define (let*->nested let-block)
+  (define (let*-iter real-body vars exps)
+    (if (last-var? vars)
+        (list (list (make-lambda vars real-body) (car exps)))
+        (list (list (make-lambda (list (car vars))
+                           (let*-iter real-body (cdr vars) (cdr exps)))
+              (car exps)))))
+  (let ((var-list (let-variables let-block))
+        (exps-list (let-expressions let-block))
+        (body (let-body let-block)))
+    (car (let*-iter body var-list exps-list))))
+
+(let*->nested let3)
+
+(define (make-let list-of-vars list-of-expressions body)
+  (let ((list-wrap (map list list-of-expressions)))
+  (cons 'let (list (map cons list-of-vars list-wrap) body))))
+
+(define ltest (make-let '(x y )'((+ 3 4) (- 3 2)) '(* x y)))
+(let->combination ltest)
+(let*->nested ltest)

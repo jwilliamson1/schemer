@@ -10,6 +10,9 @@
 (define (let? exp) 
   (tagged-list? exp 'let))
 
+(define (named-let? exp)
+  (tagged-list? (cdr exp)))
+
 (define (let-assignments let-block)
   (cadr let-block))
 
@@ -66,3 +69,15 @@
 (define ltest (make-let '(x y )'((+ 3 4) (- 3 2)) '(* x y)))
 (let->combination ltest)
 (let*->nested ltest)
+
+(define (fib n)
+  (let fib-iter ((a 1) (b 0) (count n))
+    (if (= count 0)
+        b
+        (fib-iter (+ a b) 
+                  a 
+                  (- count 1)))))
+
+(define (named-let let-block)
+  (let ((proc-name (car let-block))
+        (make-lambda (
