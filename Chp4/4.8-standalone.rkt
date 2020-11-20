@@ -10,9 +10,6 @@
 (define (let? exp) 
   (tagged-list? exp 'let))
 
-(define (named-let? exp)
-  (tagged-list? (cdr exp)))
-
 (define (let-assignments let-block)
   (cadr let-block))
 
@@ -25,14 +22,31 @@
 (define (let-body let-block)
   (cddr let-block))
 
-(define (let->combination let-block)
-  (let ((vars (let-variables let-block))
-        (exps (let-expressions let-block))
-        (body (let-body let-block)))
+(define (named-let? let-block)
+  (symbol? (cadr let-block)))
+
+(define (let-name let-block) (car let-block))
+
+(define (make-begin seq) (cons 'begin seq))
+
+(define (make-definition label value)(list 'define label value))
+
+(define (let->combination exp) 
+  (let* ((label (cadr exp))
+         (let-block (if (named-let? exp)(cdr exp) exp))
+         (vars (let-variables let-block))
+         (exps (let-expressions let-block))
+         (body (let-body let-block)))
     (cond ((null? vars) error "No variables in let block")
           ((null? exps) error "No expressions in let block")
           ((null? body) error "No body in let block")
-          (else (cons (make-lambda vars body) exps)))))
+          (else (if (named-let? exp)
+                    (make-lambda '() ; no params
+                                 (list 
+                                  (list (make-definition label 
+                                                         (make-lambda vars body))
+                                        (cons (make-lambda vars body) exps))))
+                    (cons (make-lambda vars body) exps))))))
 
 (define let1 '(let ((x (+ 5 5)))(+ x 1)))
 
@@ -50,15 +64,15 @@
 
 (define (let*->nested let-block)
   (define (let*-iter real-body vars exps)
-    (if (last-var? vars)
-        (list (list (make-lambda vars real-body) (car exps)))
+    (if (null? vars)
+        (list (list (make-lambda vars real-body)))
         (list (list (make-lambda (list (car vars))
-                           (let*-iter real-body (cdr vars) (cdr exps)))
-              (car exps)))))
-  (let ((var-list (let-variables let-block))
-        (exps-list (let-expressions let-block))
-        (body (let-body let-block)))
-    (car (let*-iter body var-list exps-list))))
+                                 (let*-iter real-body (cdr vars) (cdr exps)))
+                    (car exps)))))
+  (car (let*-iter
+        (let-body let-block)
+        (let-variables let-block)
+        (let-expressions let-block))))
 
 (let*->nested let3)
 
@@ -66,18 +80,35 @@
   (let ((list-wrap (map list list-of-expressions)))
   (cons 'let (list (map cons list-of-vars list-wrap) body))))
 
+(define (make-single-let list-of-vars list-of-expressions body)
+  (list 'let (list (list (car list-of-vars) (car list-of-expressions))) body))
+
 (define ltest (make-let '(x y )'((+ 3 4) (- 3 2)) '(* x y)))
 (let->combination ltest)
 (let*->nested ltest)
 
-(define (fib n)
-  (let fib-iter ((a 1) (b 0) (count n))
-    (if (= count 0)
-        b
-        (fib-iter (+ a b) 
-                  a 
-                  (- count 1)))))
+(define (let*->nested-lets let-block)
+  (define (let*-iter real-body vars exps)
+    (if (last-var? vars)
+        (make-single-let vars exps (car real-body))
+        (make-single-let vars exps (let*-iter real-body (cdr vars) (cdr exps)))))
+  (let*-iter (let-body let-block)
+        (let-variables let-block)
+        (let-expressions let-block)))
+(newline)
+(let*->nested-lets let3)
+(newline)
+(let->combination (let*->nested-lets let3))
+(newline)
+(let*->nested-lets ltest)
+(newline)
+(let->combination (let*->nested-lets ltest))
+; Test named let
+(define fib-iter-body '(let fib-iter ((a 1) (b 0) (count n))
+                    (if (= count 0)
+                        b
+                        (fib-iter (+ a b) 
+                                  a 
+                                  (- count 1)))))
 
-(define (named-let let-block)
-  (let ((proc-name (car let-block))
-        (make-lambda (
+(let->combination fib-iter-body)
