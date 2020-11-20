@@ -33,23 +33,36 @@
 
 (define let1 '(let ((x (+ 5 5)))(+ x 1)))
 
-(define let2 '(let ((x (+ free 2))
-                    (y (* free2 free3))) (+ 1 x y)))
+(define let2 '(let ((x (+ 1 2))
+                    (y (* x 2)))
+                (+ 1 x y)))
+
+(define let3 '(let* ((w 3)
+                    (x w)
+                    (y (+ x 2))
+                    (z (+ x y 5)))
+               (* x z)))
 
 (define (last-var? vars) (null? (cdr vars)))
 
-(define (let*->combination let-block)
-
+(define (let*->nested let-block)
   (define (let*-iter real-body vars exps)
-    (if (last-var? vars)
-         (cons (make-lambda vars real-body) exps)
-         (cons (make-lambda (list (car vars))
-                            (let*-iter real-body (cdr vars) (cdr exps)))
-                            (list (car exps)))))
-  
-   (let ((var-list (let-variables let-block))
-        (exps-list (let-expressions let-block))
-        (body (let-body let-block)))
-     (let*-iter body var-list exps-list)))
-     
-         
+    (if (null? vars)
+        (list (list (make-lambda vars real-body)))
+        (list (list (make-lambda (list (car vars))
+                                 (let*-iter real-body (cdr vars) (cdr exps)))
+                    (car exps)))))
+  (car (let*-iter
+        (let-body let-block)
+        (let-variables let-block)
+        (let-expressions let-block))))
+
+(let*->nested let3)
+
+(define (make-let list-of-vars list-of-expressions body)
+  (let ((list-wrap (map list list-of-expressions)))
+  (cons 'let (list (map cons list-of-vars list-wrap) body))))
+
+(define ltest (make-let '(x y )'((+ 3 4) (- 3 2)) '(* x y)))
+(let->combination ltest)
+(let*->nested ltest)
