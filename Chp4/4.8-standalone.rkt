@@ -55,10 +55,10 @@
                 (+ 1 x y)))
 
 (define let3 '(let* ((w 3)
-                    (x w)
-                    (y (+ x 2))
-                    (z (+ x y 5)))
-               (* x z)))
+                     (x w)
+                     (y (+ x 2))
+                     (z (+ x y 5)))
+                (* x z)))
 
 (define (last-var? vars) (null? (cdr vars)))
 
@@ -78,7 +78,7 @@
 
 (define (make-let list-of-vars list-of-expressions body)
   (let ((list-wrap (map list list-of-expressions)))
-  (cons 'let (list (map cons list-of-vars list-wrap) body))))
+    (cons 'let (list (map cons list-of-vars list-wrap) body))))
 
 (define (make-single-let list-of-vars list-of-expressions body)
   (list 'let (list (list (car list-of-vars) (car list-of-expressions))) body))
@@ -93,8 +93,8 @@
         (make-single-let vars exps (car real-body))
         (make-single-let vars exps (let*-iter real-body (cdr vars) (cdr exps)))))
   (let*-iter (let-body let-block)
-        (let-variables let-block)
-        (let-expressions let-block)))
+             (let-variables let-block)
+             (let-expressions let-block)))
 (newline)
 (let*->nested-lets let3)
 (newline)
@@ -105,10 +105,10 @@
 (let->combination (let*->nested-lets ltest))
 ; Test named let
 (define fib-iter-body '(let fib-iter ((a 1) (b 0) (count n))
-                    (if (= count 0)
-                        b
-                        (fib-iter (+ a b) 
-                                  a 
-                                  (- count 1)))))
+                         (if (= count 0)
+                             b
+                             (fib-iter (+ a b) 
+                                       a 
+                                       (- count 1)))))
 
 (let->combination fib-iter-body)
