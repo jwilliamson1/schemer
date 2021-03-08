@@ -1,0 +1,17 @@
+(lambda ?vars?
+  (let ((y '*unassigned*)
+        (dy '*unassigned*))
+    (let ((a (integral (delay dy) y0 dt))
+          (b (stream-map f y)))
+      (set! u a)
+      (set! v b)))
+
+(lambda ?vars?
+  (let ((y '*unassigned*)
+        (dy '*unassigned*))
+    (let ((a ?e1?)
+          (b ?e2?))
+      (set! u a)
+      (set! v b))
+    (define y )
+    (define dy ))
