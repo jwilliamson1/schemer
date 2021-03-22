@@ -1,0 +1,1 @@
+for a single sequence the analysis happens once but for any more than that you gain performance by bundling them together at analysis time.
