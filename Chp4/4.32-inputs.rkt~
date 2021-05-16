@@ -1,3 +1,5 @@
+#lang racket
+
 (define (cons x y) (lambda (m) (m x y)))
 (define (car z) (z (lambda (p q) p)))
 (define (cdr z) (z (lambda (p q) q)))
@@ -26,9 +28,9 @@
                      (cdr list2))))))
 
 (define ones (cons 1 ones))
+
 (define integers 
   (cons 1 (add-lists ones integers)))
-
 (list-ref integers 17)
 (define (integral integrand initial-value dt)
   (define int

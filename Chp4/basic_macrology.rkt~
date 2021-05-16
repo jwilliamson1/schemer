@@ -1,0 +1,9 @@
+#lang racket
+(define-syntax-rule (assert expr)
+  (unless expr
+    (error 'assert "assertion failed: ~s" (quote expr))))
+
+(define-syntax-rule (noisy-v1 expr)
+  (begin
+    (printf "Evaluating: ~s\n" (quote expr))
+    expr))
