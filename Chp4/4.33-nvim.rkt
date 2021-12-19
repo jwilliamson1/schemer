@@ -1,4 +1,3 @@
-#lang sicp
 (define (filter f xs)
   (if (null? xs) '()      
       (if (f (car xs))
@@ -294,9 +293,6 @@
       (make-if (cadr preds) (and->if (cdr preds))
                'false)))
 
-;(and->if '(and (= 3 1)))
-;(and->if '(and (= 2 2)(= 3 3)))
-
 (define (or? exp)
   (tagged-list? exp 'or))
 
@@ -305,9 +301,6 @@
       'false
       (make-if (cadr preds) 'true
                (or->if (cdr preds)))))
-
-;(or->if '(or false))
-;(or->if '(or true true))
 
 (define (begin? exp) 
   (tagged-list? exp 'begin))
@@ -368,16 +361,6 @@
                      (expand-clauses 
                       rest)))))))
 
-; (define (conda)
-;   (cond ((assoc 'a '((a 1)(b 2))) => cadr)
-;         (else "woop")))
-; 
-; (define (condb)
-;   (cond ((eq? 3 3) 'Three)
-;         (else 'Wrong)))
-
-
-
 (define (let? exp) 
   (tagged-list? exp 'let))
 
@@ -417,22 +400,6 @@
                                         (cons (make-lambda vars body) exps)))))
                     
           (else (cons (make-lambda vars body) exps)))))
-
-
-; (define let1 (let ((x (+ 5 5)))(+ x 1)))
-; 
-; (define let2 (let ((x (+ 1 2))
-;                     (y (* 3 2)))
-;                 (+ 1 x y)))
-; 
-; (define let3 (let* ((w 3)
-;                     (x w)
-;                     (y (+ x 2))
-;                     (z (+ x y 5)))
-;                (display z)
-;                (newline)
-;                (display x)
-;                (* x z)))
 
 
 (define (last-var? vars) (null? (cdr vars)))
@@ -494,10 +461,6 @@
                                                                "done"))))))
      (list 'do)))))
 
-;(do->lambda '(do (< x 20)(begin (display x)(set! x (+ x 2)))))
-;(do->lambda '(do (< x 10)(begin (display x)(set! x (+ x 2)))))
-
-
 (define (while->lambda exp)
   (let ((check (cadr exp))
         (body (caddr exp)))
@@ -511,9 +474,6 @@
                                                         "done"))))
      (list 'while)))))
 
-;(while->lambda '(while (< x 20)(begin (display x)(set! x (+ x 2)))))
-
-;'(begin (define x 0)(while (< x 20)(begin (display x)(set! x (+ x 2)))))
 
 (define (until->while exp)
   (let ((check (cadr exp))
@@ -521,31 +481,12 @@
     (while->lambda (list 'while (list 'not check)
           body))))
 
-;(until->while '(until (< x 20)(begin (display x)(set! x (- x 2)))))
-
-;'(begin (define x 50)(until (< x 20)(begin (display x)(set! x (- x 2)))))
 
 (define (make-let var-defs body)
   (cons 'let (cons (list var-defs) body)))
 
-; (define (make-let list-of-vars list-of-expressions body)
-;   (let ((list-wrap (map list list-of-expressions)))
-;   (cons 'let (list (map cons list-of-vars list-wrap) body))))
-
-
-;(define ltest (make-let '(x y )'((+ 3 4) (- 3 2)) '(* x y)))
-;(let->combination ltest)
-;(let*->nested ltest)
-
-;(for->lambda '(for (x 0)(< x 10)(+ x 1)(display x)))
-;(for->lambda '(for (x 10)(> x 0)(- x 1)(display x)))
-; 
-
 
 (define (make-procedure parameters body env)  
-  ;(displayln (list "normal body " body))
-  ;(let ((maybe-scanned (scan-out body)))
-    ;(displayln (list "maye scanned " maybe-scanned))
     (list 'procedure parameters body env));)
 (define (compound-procedure? p)
   (tagged-list? p 'procedure))
@@ -580,7 +521,6 @@
                  vals))))
 
 (define e1 (extend-environment '(a b) '(5 6) '()))
-;e1
 
 (define unassigned '*unassigned*)
 
@@ -629,10 +569,6 @@
     (scan frame)))
 
 
-;(define-variable! 'c 'oof e1)
-;e1
-;scan responsibilties keep state of frame iterate until null or match and do something in each case
-
 (define (setup-environment)
   (let ((initial-env
          (extend-environment 
@@ -648,19 +584,6 @@
 
 (define (primitive-implementation proc) 
   (cadr proc))
-
-;4.21
-(define (f x)
-  ((lambda (even? odd?)
-     (even? even? odd? x))
-   (lambda (ev? od? n)
-     (if (= n 0) 
-         true 
-         (od? ev? od? (- n 1))))
-   (lambda (ev? od? n)
-     (if (= n 0) 
-         false 
-         (ev? ev? od? (- n 1))))))
 
 (define primitive-procedures
   (list (list 'car car)
@@ -705,6 +628,10 @@
 (define input-prompt  ";;; L-Eval input:")
 (define output-prompt ";;; L-Eval value:")
 
+(define the-global-environment 
+  (setup-environment))
+(add-binding-to-frame! 'f 0 (first-frame the-global-environment))
+
 (define (driver-loop)
   (prompt-for-input input-prompt)
   (let ((input (read)))
@@ -733,40 +660,7 @@
 		(display 'lazy-list))
 	(else (display object))))
 
-(define the-global-environment 
-  (setup-environment))
-(add-binding-to-frame! 'f 0 (first-frame the-global-environment))
-; 4.16 pt 2
-(define internal
-  '((even? x)
-    (define y (* x 2))
-    
-  (define (even? n)
-    (if (= n 0)
-        true
-        (odd? (- n 1))))
-  (define (odd? n)
-    (if (= n 0)
-        false
-        (even? (- n 1))))
-  ))
 
-; (define (int-test x)
-;   (if (even? x) y x)
-;   (define y (* x 2))
-;     
-;   (define (even? n)
-;     (if (= n 0)
-;         true
-;         (odd? (- n 1))))
-;   (define (odd? n)
-;     (if (= n 0)
-;         false
-;         (even? (- n 1))))
-;   )
-
-
-;(lambda-body internal)
 (define (get-internal-defs body)
   (filter (lambda (exp)(and (pair? exp)(eq? (car exp) 'define))) body))
 (define (the-actual-body body)
@@ -787,22 +681,6 @@
   (if (null? def) #f
       (if (and (pair? (car def)) (eq? (caar def) 'define)) #t
           (body-contains-defs (cdr def)))))
-;(displayln "body-contains-defs")
-;(body-contains-defs internal)
-(define (scan-out body)
-  (if (body-contains-defs body)
-      ((lambda (thebody) (append                                 
-                                  (append (let-inits thebody) (let-setvals thebody)) (list (the-actual-body thebody)))) body)
-      body))
-;(displayln "scanout")
-;(scan-out internal)
-;(scan-out '(* x x))
-; (lambda ⟨vars⟩
-;   (let ((u '*unassigned*)
-;         (v '*unassigned*))
-;     (set! u ⟨e1⟩)
-;     (set! v ⟨e2⟩)
-;     ⟨e3⟩))
 
 (define (letrec? exp) (tagged-list? exp 'letrec))
 (define (letrec-bindings exp)(cadr exp))
@@ -815,203 +693,5 @@
   (let ((letrec-inits (map make-letrec-its (letrec-bindings exp)))
         (letrec-rebinds (map make-letrec-rebinds (letrec-bindings exp))))
         (append (list 'let letrec-inits) (append letrec-rebinds (letrec-body exp)))))
-(define letrec1 '(letrec
-      ((even?
-        (lambda (n)
-          (if (= n 0)
-              true
-              (odd? (- n 1)))))
-       (odd?
-        (lambda (n)
-          (if (= n 0)
-              false
-              (even? (- n 1))))))
-    (even? 5)))
-(letrec->let letrec1)
-; '(letrec
-;       ((even?
-;         (lambda (n)
-;           (if (= n 0)
-;               true
-;               (odd? (- n 1)))))
-;        (odd?
-;         (lambda (n)
-;           (if (= n 0)
-;               false
-;               (even? (- n 1))))))
-;     (even? 5))
-; ;e0 lambda vars-in-body
-; ;eval letrec->let
-; ;eval let->(lambda *unassigned *unassigned)
-; ;creates e1
-; ;even? *unassigned*
-; ;odd? *unassigned
-; ;set even and odd to lambdas
-; ;eval f body
-; 
-; ;if let
-; ;e0 lambda vars-in-body
-; ;eval let
-; ;eval let-> (lambda (l1 l2))
-; ;eval of lambdas would create procs
-; ; that don't have odd? or even? in their envs
-; (define (f x)
-;   (letrec
-;       ((even?
-;         (lambda (n)
-;           (if (= n 0)
-;               true
-;               (odd? (- n 1)))))
-;        (odd?
-;         (lambda (n)
-;           (if (= n 0)
-;               false
-;               (even? (- n 1))))))
-;     (even? x)))
-; 
-; (define (factorial x)(letrec
-;     ((fact
-;       (lambda (n)
-;         (if (= n 1)
-;             1
-;             (* n (fact (- n 1)))))))
-;   (fact x)))
-; 
-; ((lambda (n)
-;    ((lambda (fib) (fib fib n 0))
-;     (lambda (ft k a)
-;       (if (= k 1)
-;           1
-;           (* k (ft ft (- k 1)))))))
-;  10)
-; 
-; ((lambda (n)
-;    ((lambda (fib) (fib fib n))
-;       (lambda (fb k)
-;         (cond
-;           ((< k 0) (error k))
-;           ((= k 0) 0)
-;           ((= k 1) 1)
-;           (else (+ (fb fb (- k 1))(fb fb (- k 2))))))))
-;  8)
-; 
-; 
-
 
 (driver-loop)
-; (define (conda)
-;   (cond ((assoc 'a '((a 1)(b 2))) => cadr)
-;         (else "woop")))
-; 
-; (define (condb)
-;   (cond ((eq? 3 3) 'Three)
-;         (else 'Wrong)))
-; 
-; (for (x 0)(< x 10)(+ x 1)
-;   (display x))
-; 
-; (for (x 10)(> x 0)(- x 1)
-;   (begin
-;     (set! x (- x 1))
-;     (for (y x)(< y 10)(+ y 1)
-;       (begin (display " ")(display (+ y x))))))
-; 
-; (define let1 (let ((x (+ 5 5)))(+ x 1)))
-; 
-; (define let2 (let ((x (+ 1 2))
-;                     (y (* 3 2)))
-;                 (+ 1 x y)))
-; 
-; (define let3 (let* ((w 3)
-;                     (x w)
-;                     (y (+ x 2))
-;                     (z (+ x y 5)))
-;                (display z)
-;                (newline)
-;                (display x)
-;                (* x z)))
-; 
-; (define (fib n)
-;   (let fib-iter ((a 1) (b 0) (count n))
-;     (if (= count 0)
-;         b
-;         (fib-iter (+ a b) 
-;                   a 
-;                   (- count 1)))))
-; 
-; (define g (let go ((xs '(1 2 3 4)))
-;   (if (not (null? xs))
-;     (begin (display (car xs))
-;     (newline)
-;     (go (cdr xs))))))
-
-
-
-;4.24 w/ analysis
-
-
-(define (A x y)
-  (cond ((= y 0) 0)
-        ((= x 0) (* 2 y))
-        ((= y 1) 2)
-        (else (A (- x 1)
-                 (A x (- y 1))))))        
-
-(define (factorial x)(letrec
-    ((fact
-      (lambda (n)
-        (if (= n 1)
-            1
-            (* n (fact (- n 1)))))))
-  (fact x)))
-
-
-(define (time-function fn)
-  (let ((t1 (runtime)))
-    (fn)
-    (let ((t2 (runtime)))
-      (cons "runtime: " (cons (- t2 t1) '())))))
-
-;(time-function (lambda () (eval '(begin (define (factorial x)(letrec
-;    ((fact
-;      (lambda (n)
-;        (if (= n 1)
-;            1
-;            (* n (fact (- n 1)))))))
-;  (fact x)))(factorial 10000)) the-global-environment)))
-;
-;(time-function (lambda () (eval '(begin (define (fib n)
-;  (let fib-iter ((a 1) (b 0) (count n))
-;    (if (= count 0)
-;        b
-;        (fib-iter (+ a b) 
-;                  a 
-;                  (- count 1)))))(fib 100000)) the-global-environment)))
-;
-;(time-function (lambda () (eval '(begin (define (A x y)
-;  (cond ((= y 0) 0)
-;        ((= x 0) (* 2 y))
-;        ((= y 1) 2)
-;        (else (A (- x 1)
-;                 (A x (- y 1)))))) (A 1 1)) the-global-environment)))
-
-(define (unless pred con alt)(if pred alt con))
-
-; 4.27
-(define count 0)
-(define (id x) (set! count (+ count 1)) x)
-(define w (id (id 10)))
-(define (zip f  as bs)
-  (if (or (null? bs)(null? as)) '()
-      (cons (f (car as) (car bs))'
-            (zip f (cdr ls)))))
-;count -> 0
-;w -> 10 and count = 2
-;4.29
-(define (fib n)
-  (let fib-iter ((a 1) (b 0) (count n))
-    (if (= count 0)
-        b
-        (fib-iter (+ a b) 
-                  a 
-                  (- count 1)))))
