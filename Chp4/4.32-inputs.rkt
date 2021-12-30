@@ -1,4 +1,5 @@
-(define (cons x y) (cons 'lazy-list (lambda (m) (m x y))))
+
+(define (cons x y) (lambda (m) (m x y)))
 (define (car z) (z (lambda (p q) p)))
 (define (cdr z) (z (lambda (p q) q)))
 (define (list-ref items n)
