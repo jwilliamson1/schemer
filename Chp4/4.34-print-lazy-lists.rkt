@@ -416,6 +416,18 @@
       (make-let (car var-defs) (list (sequence->exp body)))
       (make-let (car var-defs) (list (expand-let* (cdr var-defs) body)))))
 
+(define (letrec? exp) (tagged-list? exp 'letrec))
+(define (letrec-bindings exp)(cadr exp))
+(define (letrec-body exp)(cddr exp))
+(define (binding-var binding) (car binding))
+(define (binding-body binding) (cadr binding))
+(define (make-letrec-its binding) (list (binding-var binding) ''*unassigned*))
+(define (make-letrec-rebinds binding) (list 'set! (binding-var binding) (binding-body binding)))
+(define (letrec->let exp)
+  (let ((letrec-inits (map make-letrec-its (letrec-bindings exp)))
+        (letrec-rebinds (map make-letrec-rebinds (letrec-bindings exp))))
+        (append (list 'let letrec-inits) (append letrec-rebinds (letrec-body exp)))))
+
 (define (for? exp) 
   (and (tagged-list? exp 'for)(not (null? (cdr exp)))))
 
@@ -634,42 +646,39 @@
 (define (announce-output string)
   (newline) (display string) (newline))
 
-(define (lazy-list? exp)
+(define the-global-environment 
+  (setup-environment))
+
+
+(define (lazy-pair? exp)
   (tagged-list? exp 'lazy-list))
 
-(define (display-list lazy-pair-syntax) ; lazy-list (lambda (m)... 
+(define (display-list lazy-pair-syntax isFirst) ; lazy-list (lambda (m)... 
   (let ((lambda-representation (cdr lazy-pair-syntax))) ; (lambda (m) ...
-    (let ((x (lookup-variable-value 'x (procedure-environment lambda-representation)))
-          (y (lookup-variable-value 'y (procedure-environment lambda-representation))))
-      (displayln (list (force-it x) " "))
-      (user-print (force-it y)))))
+    (let ((x (force-it (lookup-variable-value 'x (procedure-environment lambda-representation))))
+          (y (force-it (lookup-variable-value 'y (procedure-environment lambda-representation)))))
+      (if isFirst (display "("))
+      (if (lazy-pair? x)
+          (display-list x true)
+          (display  x))
+      (cond ((lazy-pair? y)(begin (display " ")(display-list y false)))
+            ((eq? y '()) (display ")"))
+            (else                
+             (begin (display " . ")
+                    (user-print y)
+                    (display ")")))))))
    ; (user-print (cdr lst)))) ;bind cdr to same m
 
 (define (user-print object)
-  (if (lazy-list? object)
-      (display-list object)
+  (if (lazy-pair? object)
+      (display-list object true)
       (if (compound-procedure? object)
           (display 
            (list 'compound-procedure
                  (procedure-parameters object)
                  (procedure-body object)
                  '<procedure-env>))
-          (display object)))
-  )
-
-(define the-global-environment 
-  (setup-environment))
-(define (letrec? exp) (tagged-list? exp 'letrec))
-(define (letrec-bindings exp)(cadr exp))
-(define (letrec-body exp)(cddr exp))
-(define (binding-var binding) (car binding))
-(define (binding-body binding) (cadr binding))
-(define (make-letrec-its binding) (list (binding-var binding) ''*unassigned*))
-(define (make-letrec-rebinds binding) (list 'set! (binding-var binding) (binding-body binding)))
-(define (letrec->let exp)
-  (let ((letrec-inits (map make-letrec-its (letrec-bindings exp)))
-        (letrec-rebinds (map make-letrec-rebinds (letrec-bindings exp))))
-        (append (list 'let letrec-inits) (append letrec-rebinds (letrec-body exp)))))
+          (display object))))
 
 (define (driver-loop)
   (prompt-for-input input-prompt)
